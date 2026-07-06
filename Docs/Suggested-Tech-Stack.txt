@@ -1,0 +1,57 @@
+Suggested Tech Stack
+Layer
+Technology
+Frontend
+React.js or Next.js
+Styling
+Tailwind CSS
+Backend
+Node.js + Express.js
+Database
+PostgreSQL or Supabase
+Authentication
+JWT / Clerk / Supabase Auth
+AI Integration
+Groq API LLM
+Static Analysis
+ESLint, Pylint, Sonar-style tools
+File Storage
+Local Storage / Supabase Storage
+Deployment
+Vercel + Render / Railway
+
+
+Database Design
+Users
+id
+name
+email
+password
+created_at
+
+Projects
+id
+user_id
+project_name
+github_url
+created_at
+
+Reviews
+id
+project_id
+review_type
+overall_score
+summary
+created_at
+
+Review Findings
+id
+review_id
+severity
+issue
+explanation
+suggested_fix
+file_name
+line_number
+
+

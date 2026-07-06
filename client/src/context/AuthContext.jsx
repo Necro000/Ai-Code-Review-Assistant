@@ -1,0 +1,158 @@
+import { createContext, useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import {
+  loginAPI,
+  registerAPI,
+  logoutAPI,
+  getProfileAPI,
+} from '../api/auth';
+import api from '../api/axios';
+
+export const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Clear state on logout or auth failure
+  const clearAuth = useCallback(() => {
+    setUser(null);
+    setAccessToken(null);
+    localStorage.removeItem('accessToken');
+  }, []);
+
+  // Fetch profile when access token is set or refreshed
+  const fetchProfile = useCallback(async () => {
+    try {
+      const response = await getProfileAPI();
+      setUser(response.data.user);
+    } catch (error) {
+      clearAuth();
+    }
+  }, [clearAuth]);
+
+  // Initial session check on mount (Stateless token refresh)
+  useEffect(() => {
+    const initAuth = async () => {
+      const localToken = localStorage.getItem('accessToken');
+      if (localToken) {
+        setAccessToken(localToken);
+        try {
+          const response = await getProfileAPI();
+          setUser(response.data.user);
+        } catch (err) {
+          // Access token might have expired. Try to refresh.
+          try {
+            const { data } = await api.post('/auth/refresh');
+            localStorage.setItem('accessToken', data.data.accessToken);
+            setAccessToken(data.data.accessToken);
+            const userResponse = await getProfileAPI();
+            setUser(userResponse.data.user);
+          } catch (refreshErr) {
+            clearAuth();
+          }
+        }
+      } else {
+        // No token in memory, try refreshing via HTTPOnly Cookie
+        try {
+          const { data } = await api.post('/auth/refresh');
+          localStorage.setItem('accessToken', data.data.accessToken);
+          setAccessToken(data.data.accessToken);
+          const userResponse = await getProfileAPI();
+          setUser(userResponse.data.user);
+        } catch (refreshErr) {
+          clearAuth();
+        }
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, [clearAuth]);
+
+  // Login handler
+  const login = async (email, password) => {
+    setIsLoading(true);
+    try {
+      const response = await loginAPI(email, password);
+      const token = response.data.accessToken;
+      localStorage.setItem('accessToken', token);
+      setAccessToken(token);
+      setUser(response.data.user);
+      toast.success(response.message || 'Logged in successfully!');
+      navigate('/dashboard');
+      return true;
+    } catch (error) {
+      const errorMsg = error.response?.data?.error?.message || 'Login failed. Please check credentials.';
+      toast.error(errorMsg);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Registration handler
+  const register = async (name, email, password) => {
+    setIsLoading(true);
+    try {
+      const response = await registerAPI(name, email, password);
+      toast.success(response.message || 'Registration successful! Please log in.');
+      navigate('/login');
+      return true;
+    } catch (error) {
+      const errorMsg = error.response?.data?.error?.message || 'Registration failed.';
+      if (error.response?.data?.error?.details) {
+        error.response.data.error.details.forEach((detail) => {
+          toast.error(detail.message);
+        });
+      } else {
+        toast.error(errorMsg);
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Logout handler
+  const logout = async () => {
+    const loadingToast = toast.loading('Logging out...');
+    try {
+      await logoutAPI();
+      clearAuth();
+      toast.success('Logged out successfully!', { id: loadingToast });
+      navigate('/login');
+    } catch (error) {
+      clearAuth();
+      toast.success('Logged out.', { id: loadingToast });
+      navigate('/login');
+    }
+  };
+
+  const updateProfile = async (profileData) => {
+    try {
+      const response = await getProfileAPI(); // double check connection
+      setUser(prev => ({ ...prev, ...profileData }));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const value = {
+    user,
+    accessToken,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
+    register,
+    setUser,
+    updateProfile
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}

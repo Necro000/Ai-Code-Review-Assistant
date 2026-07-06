@@ -1,0 +1,46 @@
+AI Code Review Assistant
+Internship Project Documentation
+
+Introduction
+The AI Code Review Assistant is a modern full-stack web application that helps developers improve the quality of their code using Artificial Intelligence and static code analysis tools.
+Instead of waiting for a senior developer to review their code, users can paste individual code snippets into the application. The system automatically analyzes the code and provides detailed feedback on potential bugs, code quality, complexity, best practices, and documentation.
+This project exposes students to real-world software engineering concepts such as API integration, authentication, AI-powered applications, code analysis, GitHub integration, and database design. It is an excellent internship-level project because it combines modern web development with practical software engineering workflows.
+
+Project Explanation
+The AI Code Review Assistant acts as an automated code reviewer.
+A user signs in to the application and can either:
+Paste one or more code lines (We will work on)
+Upload source code files directly (We will work on)
+The backend retrieves the source code and performs a two-stage review process:
+Stage 1: Static Code Analysis
+The system uses programming language-specific tools (such as ESLint, Pylint, or similar) to detect:
+Syntax errors
+Unused variables
+Coding standard violations
+Formatting issues
+Possible runtime errors
+Security warnings
+Stage 2: AI-Based Review
+The analyzed code is then processed by an AI model to provide:
+Bug detection
+Code smell identification
+Suggestions for improvement
+Complexity analysis
+Better variable/function naming
+Performance optimization suggestions
+Code explanation
+Auto-generated documentation
+Refactoring recommendations
+The results are displayed in a clean dashboard where users can explore each issue along with its severity and suggested solution.
+Every review is stored in the user's history for future reference.
+
+Project Objectives
+The primary objectives of this project are to:
+Build a production-like full-stack application
+Work with AI APIs
+Understand static code analysis
+Practice authentication and authorization
+Design scalable database schemas
+Improve frontend UI/UX development
+Learn API integration
+Practice deployment of full-stack applications

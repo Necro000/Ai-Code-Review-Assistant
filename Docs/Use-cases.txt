@@ -1,0 +1,20 @@
+Use Cases
+Student
+A student uploads their assignment before submission to identify bugs and improve code quality.
+
+Internship Preparation
+Students review their personal projects before adding them to their resume.
+
+Software Developers
+Developers analyze pull requests before sending them for peer review.
+
+Coding Bootcamps
+Instructors can ask students to review their code using the application before submitting assignments.
+
+Freelancers
+Freelancers can improve the quality of their client projects using automated reviews.
+
+Small Development Teams
+Teams can quickly perform code reviews without requiring a senior developer for every small change.
+
+

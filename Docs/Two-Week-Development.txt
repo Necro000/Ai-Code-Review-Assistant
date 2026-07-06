@@ -1,0 +1,34 @@
+Two-Week Development Schedule
+Day
+Tasks
+Day 1
+Project planning, requirement analysis, UI wireframes, Git repository setup
+Day 2
+Design database schema and implement user authentication
+Day 3
+Build dashboard layout, navigation, and routing
+Day 4
+Implement code snippet upload and storage
+Day 5
+Integrate GitHub Repository API to fetch repository contents (Not Working on)
+Day 6
+Integrate static code analysis tools (e.g., ESLint/Pylint)
+Day 7
+Display static analysis results in a structured dashboard
+Day 8
+Integrate AI model for code review and explanation
+Day 9
+Add complexity analysis and code smell reporting
+Day 10
+Generate documentation for functions, classes, and APIs
+Day 11
+Implement review history, search, and filtering
+Day 12
+Testing, debugging, validation, and error handling
+Day 13
+Improve UI/UX, optimize performance, and refactor code
+Day 14
+Deploy the application, prepare documentation, and present the project
+
+
+

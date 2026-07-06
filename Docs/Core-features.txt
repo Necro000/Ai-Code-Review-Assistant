@@ -1,0 +1,51 @@
+Core Features
+User Authentication
+Sign Up
+Login
+Logout
+Forgot Password
+Profile Management
+
+Code Submission
+Users should be able to:
+Paste source code
+Upload source code files
+Submit a public GitHub repository URL (Not Working on)
+
+Static Code Analysis
+The application should automatically detect:
+Syntax errors
+Unused variables
+Missing imports
+Duplicate code
+Poor formatting
+Code style violations
+
+AI Code Review
+The AI should generate:
+Bug reports
+Optimization suggestions
+Code smell analysis
+Performance improvements
+Security recommendations
+Best practice recommendations
+
+Complexity Analysis
+Generate metrics such as:
+Cyclomatic Complexity
+Function Complexity
+File Complexity
+Number of Functions
+Number of Classes
+Lines of Code
+
+Review Dashboard
+Users can view:
+Previous reviews
+Search reviews
+Filter reviews
+Delete reviews
+View detailed reports
+
+
+

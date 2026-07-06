@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AI Code Review Assistant — Database Schema
+// ============================================
+
+/// Registered users of the application.
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(50)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  projects Project[]
+
+  @@map("users")
+}
+
+/// User projects — containers for grouping code reviews.
+model Project {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  projectName String   @map("project_name") @db.VarChar(100)
+  githubUrl   String?  @map("github_url") @db.VarChar(500)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews Review[]
+
+  @@index([userId])
+  @@map("projects")
+}
+
+/// Individual code reviews containing analysis results.
+model Review {
+  id           String   @id @default(uuid())
+  projectId    String   @map("project_id")
+  reviewType   String   @map("review_type") @db.VarChar(20) // "combined", "static_only", "ai_only"
+  overallScore Float?   @map("overall_score")
+  summary      String?  @db.Text
+  codeContent  String?  @map("code_content") @db.Text // Original submitted code
+  language     String?  @db.VarChar(30)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  project  Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  findings ReviewFinding[]
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+/// Individual findings/issues discovered during a review.
+model ReviewFinding {
+  id           String  @id @default(uuid())
+  reviewId     String  @map("review_id")
+  source       String  @db.VarChar(20) // "eslint", "pylint", "ai"
+  severity     String  @db.VarChar(10) // "error", "warning", "info"
+  rule         String? @db.VarChar(100) // Linter rule name (e.g., "no-unused-vars")
+  issue        String  @db.Text
+  explanation  String? @db.Text
+  suggestedFix String? @map("suggested_fix") @db.Text
+  fileName     String? @map("file_name") @db.VarChar(255)
+  lineNumber   Int?    @map("line_number")
+  column       Int?
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([severity])
+  @@map("review_findings")
+}
