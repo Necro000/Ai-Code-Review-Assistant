@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { HiOutlineCloudArrowUp, HiOutlineTrash, HiOutlineDocumentCode } from 'react-icons/hi2';
+import { HiOutlineCloudArrowUp, HiOutlineTrash, HiOutlineDocumentText } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
 const ALLOWED_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.py', '.java', '.cpp', '.c', '.go', '.rb', '.txt'];
@@ -139,7 +139,7 @@ export default function FileUploader({ files, onChange }) {
               className="flex items-center justify-between p-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] transition-colors duration-200"
             >
               <div className="flex items-center gap-3">
-                <HiOutlineDocumentCode className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
+                <HiOutlineDocumentText className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
                 <div className="flex flex-col">
                   <span className="text-sm font-medium text-white max-w-[200px] sm:max-w-xs truncate">
                     {file.name}

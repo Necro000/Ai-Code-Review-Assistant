@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { HiOutlineUser, HiOutlineLockClosed, HiOutlineArrowRightOnRectangle, HiOutlineCheck } from 'react-icons/svg';
-import { HiOutlineEnvelope } from 'react-icons/hi2';
+import { HiOutlineUser, HiOutlineLockClosed, HiOutlineArrowRightOnRectangle, HiOutlineCheck, HiOutlineEnvelope } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 import useAuth from '../hooks/useAuth';
 import { updateProfileAPI, changePasswordAPI } from '../api/auth';

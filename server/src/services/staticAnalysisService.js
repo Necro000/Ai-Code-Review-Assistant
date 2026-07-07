@@ -7,8 +7,16 @@ const { v4: uuidv4 } = require('uuid');
 
 const execAsync = util.promisify(exec);
 
-// Ensure tmp directory exists
+// Paths
 const tempDir = path.join(__dirname, '../../tmp');
+
+// Resolve local ESLint v8 binary — installed in server/node_modules
+// __dirname is server/src/services → go up 2 levels → server root
+const serverRoot = path.resolve(__dirname, '../..');
+const eslintBin = path.join(serverRoot, 'node_modules', 'eslint', 'bin', 'eslint.js');
+const eslintConfig = path.join(__dirname, '../config/eslint-fallback.json');
+
+// Ensure tmp directory exists
 if (!existsSync(tempDir)) {
   require('fs').mkdirSync(tempDir, { recursive: true });
 }
@@ -74,7 +82,8 @@ const normalizePylintResults = (results) => {
 };
 
 /**
- * Runs ESLint on JavaScript/TypeScript code
+ * Runs ESLint (v8, local node_modules) on JavaScript/TypeScript code.
+ * Uses local binary directly to avoid global ESLint version conflicts.
  */
 const runESLint = async (code) => {
   const filename = `${uuidv4()}.js`;
@@ -83,20 +92,16 @@ const runESLint = async (code) => {
   await fs.writeFile(filepath, code, 'utf8');
 
   try {
-    // Run npx eslint. Using --no-eslintrc to ignore global/other config conflicts.
-    // Specifying basic rules via inline config.
-    const eslintCmd = `npx eslint "${filepath}" --format json --no-eslintrc --config ${path.join(
-      __dirname,
-      '../config/eslint-fallback.json'
-    )}`;
-    
-    // We expect ESLint to exit with 1 if errors are found, so we capture the stdout from the error object too
+    // Use local node_modules ESLint v8 binary with explicit config file
+    // --no-eslintrc disables all project-level configs, --config applies only our rules
+    const eslintCmd = `node "${eslintBin}" "${filepath}" --format json --no-eslintrc --config "${eslintConfig}"`;
+
     let stdout;
     try {
-      const result = await execAsync(eslintCmd, { timeout: 15000 });
+      const result = await execAsync(eslintCmd, { timeout: 20000, shell: true });
       stdout = result.stdout;
     } catch (execError) {
-      // ESLint returns exit code 1 if checks fail; check if we got output in stdout anyway
+      // ESLint returns exit code 1 when findings exist — stdout still has JSON results
       if (execError.stdout) {
         stdout = execError.stdout;
       } else {
@@ -108,14 +113,13 @@ const runESLint = async (code) => {
     return normalizeESLintResults(parsed);
   } catch (error) {
     console.warn('⚠️ ESLint execution issue:', error.message);
-    // If it's a configuration error or ESLint not installed, return partial parser error
     return [
       {
         source: 'eslint',
         severity: 'info',
         rule: 'eslint-error',
         issue: 'Static check skipped.',
-        explanation: 'ESLint was unable to parse this file structure (could be configuration/dependency error).',
+        explanation: 'ESLint was unable to analyze this code (configuration or parse error).',
         suggestedFix: null,
         lineNumber: 1,
         column: 1,
@@ -126,13 +130,13 @@ const runESLint = async (code) => {
     try {
       await fs.unlink(filepath);
     } catch (e) {
-      // ignore
+      // ignore cleanup errors
     }
   }
 };
 
 /**
- * Runs Pylint on Python code
+ * Runs Pylint on Python code.
  */
 const runPylint = async (code) => {
   const filename = `${uuidv4()}.py`;
@@ -142,10 +146,10 @@ const runPylint = async (code) => {
 
   try {
     const pylintCmd = `pylint "${filepath}" --output-format=json --disable=C0114,C0115,C0116`;
-    
+
     let stdout;
     try {
-      const result = await execAsync(pylintCmd, { timeout: 15000 });
+      const result = await execAsync(pylintCmd, { timeout: 20000, shell: true });
       stdout = result.stdout;
     } catch (execError) {
       // Pylint returns exit code flags on findings; capture stdout
@@ -166,7 +170,7 @@ const runPylint = async (code) => {
         severity: 'info',
         rule: 'pylint-error',
         issue: 'Pylint check skipped.',
-        explanation: 'Pylint linter is not installed on this server host or Python execution failed.',
+        explanation: 'Pylint is not installed on this server or Python execution failed.',
         suggestedFix: null,
         lineNumber: 1,
         column: 1,
@@ -176,13 +180,13 @@ const runPylint = async (code) => {
     try {
       await fs.unlink(filepath);
     } catch (e) {
-      // ignore
+      // ignore cleanup errors
     }
   }
 };
 
 /**
- * Main Static Analysis Router
+ * Main Static Analysis Router — dispatches to the correct linter by language.
  */
 const analyzeCode = async (code, language) => {
   if (!code || !language) return [];
@@ -195,7 +199,7 @@ const analyzeCode = async (code, language) => {
     return await runPylint(code);
   }
 
-  // No linter supported for this language yet
+  // No linter available for this language
   return [];
 };
 

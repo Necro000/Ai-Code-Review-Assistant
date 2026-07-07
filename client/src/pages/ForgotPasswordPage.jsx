@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { HiOutlineEnvelope, HiOutlineArrowRight, HiOutlineArrowLeft, HiOutlineCheckCircle } from 'react-icons/svg';
-import { HiOutlineCodeBracketSquare } from 'react-icons/hi2';
+import { HiOutlineEnvelope, HiOutlineArrowRight, HiOutlineArrowLeft, HiOutlineCheckCircle, HiOutlineCodeBracketSquare } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 import { forgotPasswordAPI, resetPasswordAPI } from '../api/auth';
 

@@ -1,11 +1,99 @@
 const groq = require('../config/groq');
 const env = require('../config/env');
 const AppError = require('../utils/AppError');
+const { prisma } = require('../config/db');
 
 /**
  * Wait utility for retrying with backoff
  */
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Sliding window of requests in the last 60 seconds to enforce 30 RPM / 1K TPM limits
+let slidingWindow = [];
+
+const cleanSlidingWindow = () => {
+  const now = Date.now();
+  slidingWindow = slidingWindow.filter(r => now - r.time < 60000);
+};
+
+const getSlidingTotals = () => {
+  cleanSlidingWindow();
+  const count = slidingWindow.length;
+  const tokens = slidingWindow.reduce((sum, r) => sum + r.tokens, 0);
+  return { count, tokens };
+};
+
+/**
+ * Estimates tokens based on character length (approx 4 characters = 1 token)
+ */
+const estimateTokens = (promptText, expectedCompletion = 300) => {
+  return Math.ceil(promptText.length / 4) + expectedCompletion;
+};
+
+/**
+ * Checks and enforces daily quotas (12K requests / 100K tokens) via database records
+ */
+const checkDailyQuotas = async (estimatedTokens) => {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  // Fetch reviews created today
+  const reviewsToday = await prisma.review.findMany({
+    where: {
+      createdAt: {
+        gte: startOfDay,
+      },
+    },
+    select: {
+      codeContent: true,
+      summary: true,
+    },
+  });
+
+  const dailyRequestCount = reviewsToday.length;
+  if (dailyRequestCount >= 12000) {
+    throw new AppError('Daily AI review limit reached (Max 12,000 requests/day). Please try again tomorrow.', 429, 'DAILY_LIMIT_EXCEEDED');
+  }
+
+  // System prompt is ~140 tokens. User prompt headers are ~40 tokens. Base per request is ~180 tokens.
+  const baseTokensPerRequest = 180;
+  let dailyTokensUsed = 0;
+
+  reviewsToday.forEach((r) => {
+    const codeLen = r.codeContent ? r.codeContent.length : 0;
+    const summaryLen = r.summary ? r.summary.length : 0;
+    dailyTokensUsed += Math.ceil((codeLen + summaryLen) / 4) + baseTokensPerRequest;
+  });
+
+  if (dailyTokensUsed + estimatedTokens > 100000) {
+    throw new AppError('Daily AI token quota exceeded (Max 100,000 tokens/day). Please try again tomorrow.', 429, 'DAILY_LIMIT_EXCEEDED');
+  }
+};
+
+/**
+ * Throttles execution if minute limits are temporarily reached
+ */
+const throttleMinuteLimits = async (estimatedTokens) => {
+  const maxWaitTime = 30000; // max wait 30 seconds
+  const start = Date.now();
+
+  while (true) {
+    const { count, tokens } = getSlidingTotals();
+
+    // 30 RPM and 1K (1,000) TPM limit checks
+    if (count < 30 && tokens + estimatedTokens <= 1000) {
+      break;
+    }
+
+    const elapsed = Date.now() - start;
+    if (elapsed >= maxWaitTime) {
+      throw new AppError('AI Code Review is temporarily busy. Please wait a minute and try again.', 429, 'RATE_LIMIT_EXCEEDED');
+    }
+
+    // Sleep 1 second before rechecking
+    await sleep(1000);
+  }
+};
 
 /**
  * Sanitizes AI response text to strip markdown code blocks if present
@@ -29,48 +117,28 @@ const cleanJSONResponse = (text) => {
 };
 
 /**
- * Builds the prompt messages array for Groq
+ * Builds a highly compact, token-efficient prompt message array.
+ * Saves system tokens to maximize allowed user code input under 1K TPM limit.
  */
 const buildPrompt = (code, language, staticFindings) => {
-  const systemPrompt = `You are a world-class senior code reviewer and software engineer.
-Analyze the provided code snippet and return a structured JSON report containing code quality findings.
-Focus on identifying real bugs, performance optimizations, security vulnerabilities, naming issues, and readability.
-
-Your response MUST be a single, valid JSON object matching this schema exactly:
+  const systemPrompt = `You are a senior reviewer. Return ONLY a JSON object:
 {
-  "overall_score": 85, // number from 0 to 100
-  "summary": "High-level summary of the code quality and major issues found.",
-  "bugs": [
-    { "line": 12, "severity": "critical", "description": "NullPointerException risk when user is null.", "fix": "Check for null: if (user != null) { ... }" }
-  ],
-  "code_smells": [
-    { "line": 24, "description": "Function is too long and performs multiple duties.", "suggestion": "Extract database write logic into writeToDatabase()." }
-  ],
-  "optimizations": [
-    { "description": "Loop scans array multiple times.", "suggestion": "Convert array to Map for O(1) lookups." }
-  ],
-  "security_issues": [
-    { "severity": "critical", "description": "SQL Injection vulnerability via template string concat.", "fix": "Use parameterized query placeholders instead." }
-  ],
-  "naming_suggestions": [
-    { "current": "x", "suggested": "userAge", "reason": "Self-documenting variables improve readability." }
-  ],
-  "refactoring_tips": [
-    "Use ES6 destructuring for properties.",
-    "Separate concerns by decoupling logic."
-  ],
-  "documentation": "Generate a concise docstring or documentation description for the primary function/class in this code.",
-  "complexity_notes": "Write a short summary about the cyclomatic complexity, loops, and control structure paths."
-}
-
-Ensure all JSON brackets align and keys/string values are properly quoted.
-Do NOT output any other text, prefix, or suffix. Return ONLY the JSON object.`;
+  "overall_score": 85,
+  "summary": "Brief summary.",
+  "bugs": [{"line": 12, "severity": "critical|warning|info", "description": "Msg", "fix": "Fix"}],
+  "code_smells": [{"line": 24, "description": "Msg", "suggestion": "Fix"}],
+  "optimizations": [{"description": "Msg", "suggestion": "Fix"}],
+  "security_issues": [{"severity": "critical|warning", "description": "Msg", "fix": "Fix"}],
+  "naming_suggestions": [{"current": "x", "suggested": "y", "reason": "Msg"}],
+  "refactoring_tips": ["Tip"],
+  "documentation": "Docstring.",
+  "complexity_notes": "Complexity overview."
+}`;
 
   const userPrompt = `Language: ${language}
 ${staticFindings && staticFindings.length > 0 
-  ? `Static analysis findings discovered (please augment, explain or add to these, do not repeat them redundantly):\n${JSON.stringify(staticFindings, null, 2)}`
+  ? `Static findings:\n${JSON.stringify(staticFindings, null, 1)}`
   : ''}
-
 Code to analyze:
 \`\`\`${language}
 ${code}
@@ -84,6 +152,22 @@ ${code}
  */
 const getAIReview = async (code, language, staticFindings) => {
   const { systemPrompt, userPrompt } = buildPrompt(code, language, staticFindings);
+  
+  // 1. Estimate total tokens needed for this request (Prompt + Response)
+  const fullPromptText = systemPrompt + userPrompt;
+  const estimatedTokens = estimateTokens(fullPromptText, 300); // Expect ~300 token response
+
+  // 2. Fail fast if a single request's code size exceeds the 1K minute limit
+  if (estimatedTokens > 1000) {
+    throw new AppError('The code is too long for the active model token limit (Max ~1,500 characters of code). Please submit a smaller snippet.', 400, 'CODE_TOO_LARGE');
+  }
+
+  // 3. Enforce Daily Limit (12K requests, 100K tokens)
+  await checkDailyQuotas(estimatedTokens);
+
+  // 4. Enforce Sliding Window Minute Limit (30 RPM, 1K TPM)
+  await throttleMinuteLimits(estimatedTokens);
+
   const maxRetries = 3;
   let attemptDelay = 2000;
 
@@ -97,7 +181,7 @@ const getAIReview = async (code, language, staticFindings) => {
           { role: 'user', content: userPrompt },
         ],
         temperature: 0.2, // Low temperature for consistent deterministic findings
-        max_tokens: 4096,
+        max_tokens: 600, // Reduced from 4096 to prevent runaway tokens violating minute limits
         response_format: { type: 'json_object' }, // Groq supports JSON Mode
       });
 
@@ -108,6 +192,15 @@ const getAIReview = async (code, language, staticFindings) => {
 
       const cleanedText = cleanJSONResponse(responseText);
       const parsedReview = JSON.parse(cleanedText);
+
+      // Log successful transaction into sliding window
+      const actualCompletionTokens = Math.ceil(cleanedText.length / 4);
+      const actualTotalTokens = Math.ceil(fullPromptText.length / 4) + actualCompletionTokens;
+
+      slidingWindow.push({
+        time: Date.now(),
+        tokens: actualTotalTokens,
+      });
 
       return parsedReview;
     } catch (error) {

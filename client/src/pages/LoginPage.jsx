@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineArrowRight } from 'react-icons/svg';
-import { HiOutlineCodeBracketSquare } from 'react-icons/hi2';
+import { HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineCodeBracketSquare } from 'react-icons/hi2';
 import useAuth from '../hooks/useAuth';
 
 export default function LoginPage() {

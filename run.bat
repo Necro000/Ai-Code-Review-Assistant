@@ -1,0 +1,6 @@
+@echo off
+echo Starting Backend Server...
+start "Backend Server" cmd /c "cd /d D:\Ai CRA\Ai-Code-Review-Assistant\server && npm run dev"
+echo Starting Frontend Server...
+start "Frontend Server" cmd /c "cd /d D:\Ai CRA\Ai-Code-Review-Assistant\client && npm run dev"
+echo Both servers started!

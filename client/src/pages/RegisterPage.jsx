@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { HiOutlineUser, HiOutlineLockClosed, HiOutlineArrowRight } from 'react-icons/svg';
-import { HiOutlineCodeBracketSquare } from 'react-icons/hi2';
+import { HiOutlineUser, HiOutlineLockClosed, HiOutlineArrowRight, HiOutlineCodeBracketSquare } from 'react-icons/hi2';
 import useAuth from '../hooks/useAuth';
 
 export default function RegisterPage() {

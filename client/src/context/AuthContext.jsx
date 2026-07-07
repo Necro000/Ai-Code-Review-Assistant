@@ -6,6 +6,7 @@ import {
   registerAPI,
   logoutAPI,
   getProfileAPI,
+  updateProfileAPI,
 } from '../api/auth';
 import api from '../api/axios';
 
@@ -134,8 +135,13 @@ export function AuthProvider({ children }) {
 
   const updateProfile = async (profileData) => {
     try {
-      const response = await getProfileAPI(); // double check connection
-      setUser(prev => ({ ...prev, ...profileData }));
+      const response = await updateProfileAPI(profileData);
+      // Sync the local user state from the server's returned user object
+      if (response?.data?.user) {
+        setUser(response.data.user);
+      } else {
+        setUser(prev => ({ ...prev, ...profileData }));
+      }
       return true;
     } catch (error) {
       return false;
