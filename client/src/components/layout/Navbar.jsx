@@ -1,4 +1,5 @@
-import { HiOutlineCodeBracketSquare, HiOutlineBell } from 'react-icons/hi2';
+import { useState, useRef, useEffect } from 'react';
+import { HiOutlineCodeBracketSquare, HiOutlineBell, HiOutlineCheck } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
@@ -7,6 +8,46 @@ export default function Navbar() {
   const navigate = useNavigate();
   const initials = user?.name ? user.name[0].toUpperCase() : 'U';
   const displayName = user?.name ? user.name.split(' ')[0] : 'User';
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'Review Complete',
+      message: 'Your review for "db.js" completed successfully.',
+      time: 'Just now',
+      unread: true,
+    },
+    {
+      id: 2,
+      title: 'Welcome!',
+      message: 'Thanks for choosing AI Code Review Assistant. Start by creating a project.',
+      time: '1 hour ago',
+      unread: false,
+    },
+  ]);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleNotifications = () => {
+    setShowNotifications((prev) => !prev);
+  };
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    setHasUnread(false);
+  };
 
   return (
     <header
@@ -41,24 +82,87 @@ export default function Navbar() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 relative" ref={dropdownRef}>
         {/* Notifications */}
         <button
+          onClick={toggleNotifications}
           className="relative flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 cursor-pointer text-[var(--color-text-secondary)] hover:text-white"
+          style={{
+            backgroundColor: showNotifications ? 'var(--color-surface-hover)' : 'transparent',
+          }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
+            if (!showNotifications) e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
+            if (!showNotifications) e.currentTarget.style.backgroundColor = 'transparent';
           }}
           title="Notifications"
         >
           <HiOutlineBell className="w-5 h-5" />
-          <span
-            className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-            style={{ backgroundColor: 'var(--color-accent)' }}
-          />
+          {hasUnread && (
+            <span
+              className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            />
+          )}
         </button>
+
+        {/* Notifications Dropdown */}
+        {showNotifications && (
+          <div
+            className="absolute right-0 mt-2 w-80 rounded-xl border p-4 glass z-50 text-left shadow-2xl animate-fade-in"
+            style={{
+              top: 'var(--navbar-height)',
+              borderColor: 'var(--color-border)',
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            }}
+          >
+            <div
+              className="flex items-center justify-between pb-2 mb-2 border-b"
+              style={{ borderColor: 'var(--color-border)' }}
+            >
+              <span className="text-xs font-bold text-white uppercase tracking-wider">
+                Notifications
+              </span>
+              {hasUnread && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-[10px] font-semibold flex items-center gap-1 text-[var(--color-accent-hover)] hover:underline cursor-pointer"
+                >
+                  <HiOutlineCheck className="w-3 h-3" />
+                  Mark all as read
+                </button>
+              )}
+            </div>
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+              {notifications.map((n) => (
+                <div
+                  key={n.id}
+                  className="p-2.5 rounded-lg transition-colors"
+                  style={{
+                    backgroundColor: n.unread ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                  }}
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <span
+                      className={`text-xs font-semibold ${
+                        n.unread ? 'text-white' : 'text-[var(--color-text-secondary)]'
+                      }`}
+                    >
+                      {n.title}
+                    </span>
+                    <span className="text-[10px] text-[var(--color-text-muted)] whitespace-nowrap">
+                      {n.time}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">
+                    {n.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* User Avatar */}
         <button

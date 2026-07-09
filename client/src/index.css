@@ -80,53 +80,53 @@
     margin: 0;
     padding: 0;
   }
-}
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-}
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
 
-body {
-  font-family: var(--font-sans);
-  background: var(--color-bg-primary);
-  color: var(--color-text);
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-}
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg-primary);
+    color: var(--color-text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
 
-/* Subtle blueprint tech grid background */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image: 
-    linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-position: center;
-  pointer-events: none;
-}
+  /* Subtle blueprint tech grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: 
+      linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center;
+    pointer-events: none;
+  }
 
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-a {
-  color: var(--color-accent);
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
 
-a:hover {
-  color: var(--color-accent-hover);
+  a:hover {
+    color: var(--color-accent-hover);
+  }
 }
 
 /* --- Scrollbar --- */
