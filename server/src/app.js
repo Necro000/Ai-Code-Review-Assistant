@@ -11,9 +11,12 @@ const app = express();
 // Global Middleware
 // ---------------------
 
+// Trim trailing slash from CLIENT_URL if present to prevent CORS mismatches
+const corsOrigin = CLIENT_URL && CLIENT_URL.endsWith('/') ? CLIENT_URL.slice(0, -1) : CLIENT_URL;
+
 // CORS — allow frontend origin with credentials (cookies)
 app.use(cors({
-  origin: CLIENT_URL,
+  origin: corsOrigin,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
