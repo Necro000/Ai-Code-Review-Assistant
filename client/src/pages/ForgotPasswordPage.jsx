@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
                   <input
                     type="email"
                     placeholder="name@example.com"
-                    className="w-full pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border rounded-xl text-sm focus:outline-none transition-all duration-200"
+                    className="w-full pl-12 pr-4 py-3 bg-[var(--color-bg-secondary)] border rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={{
                       borderColor: requestForm.formState.errors.email ? 'var(--color-error)' : 'var(--color-border)',
                       color: 'var(--color-text)',

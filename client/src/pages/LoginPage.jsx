@@ -67,7 +67,7 @@ export default function LoginPage() {
                 <input
                   type="email"
                   placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border rounded-xl text-sm focus:outline-none transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-3 bg-[var(--color-bg-secondary)] border rounded-xl text-sm focus:outline-none transition-all duration-200"
                   style={{
                     borderColor: errors.email ? 'var(--color-error)' : 'var(--color-border)',
                     color: 'var(--color-text)',
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 <input
                   type="password"
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border rounded-xl text-sm focus:outline-none transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-3 bg-[var(--color-bg-secondary)] border rounded-xl text-sm focus:outline-none transition-all duration-200"
                   style={{
                     borderColor: errors.password ? 'var(--color-error)' : 'var(--color-border)',
                     color: 'var(--color-text)',

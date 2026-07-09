@@ -89,7 +89,7 @@ export default function HistoryPage() {
             placeholder="Search by summary, project name, language..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-accent)]"
+            className="w-full pl-12 pr-4 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-accent)]"
             style={{ color: 'var(--color-text)' }}
           />
         </div>
