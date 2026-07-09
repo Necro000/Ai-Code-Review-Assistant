@@ -49,6 +49,11 @@ export default function Navbar() {
     setHasUnread(false);
   };
 
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    setHasUnread(false);
+  };
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 border-b"
@@ -124,42 +129,62 @@ export default function Navbar() {
               <span className="text-xs font-bold text-white uppercase tracking-wider">
                 Notifications
               </span>
-              {hasUnread && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-[10px] font-semibold flex items-center gap-1 text-[var(--color-accent-hover)] hover:underline cursor-pointer"
-                >
-                  <HiOutlineCheck className="w-3 h-3" />
-                  Mark all as read
-                </button>
-              )}
+              <div className="flex items-center gap-2.5">
+                {hasUnread && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-[10px] font-semibold flex items-center gap-1 text-[var(--color-accent-hover)] hover:underline cursor-pointer"
+                  >
+                    <HiOutlineCheck className="w-3 h-3" />
+                    Read
+                  </button>
+                )}
+                {notifications.length > 0 && (
+                  <button
+                    onClick={clearAllNotifications}
+                    className="text-[10px] font-semibold flex items-center gap-1 text-[var(--color-text-muted)] hover:text-[var(--color-error)] hover:underline cursor-pointer"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
             </div>
             <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-              {notifications.map((n) => (
-                <div
-                  key={n.id}
-                  className="p-2.5 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: n.unread ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
-                  }}
-                >
-                  <div className="flex justify-between items-start gap-2">
-                    <span
-                      className={`text-xs font-semibold ${
-                        n.unread ? 'text-white' : 'text-[var(--color-text-secondary)]'
-                      }`}
-                    >
-                      {n.title}
-                    </span>
-                    <span className="text-[10px] text-[var(--color-text-muted)] whitespace-nowrap">
-                      {n.time}
-                    </span>
+              {notifications.length > 0 ? (
+                notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className="p-2.5 rounded-lg transition-colors"
+                    style={{
+                      backgroundColor: n.unread ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                    }}
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <span
+                        className={`text-xs font-semibold ${
+                          n.unread ? 'text-white' : 'text-[var(--color-text-secondary)]'
+                        }`}
+                      >
+                        {n.title}
+                      </span>
+                      <span className="text-[10px] text-[var(--color-text-muted)] whitespace-nowrap">
+                        {n.time}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">
+                      {n.message}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">
-                    {n.message}
-                  </p>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <div className="w-10 h-10 bg-[var(--color-accent-muted)] rounded-full flex items-center justify-center text-[var(--color-accent)] mb-2 animate-pulse">
+                    ✓
+                  </div>
+                  <span className="text-xs font-semibold text-white">All caught up!</span>
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5">No new notifications.</span>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
