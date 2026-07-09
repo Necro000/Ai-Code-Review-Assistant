@@ -56,7 +56,7 @@ const login = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
   try {
     // Retrieve token from cookie first, fallback to body
-    const token = req.cookies.refreshToken || req.body.refreshToken;
+    const token = req.cookies?.refreshToken || req.body?.refreshToken;
 
     const { accessToken } = await authService.refreshUserToken(token);
 
