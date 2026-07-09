@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { HiOutlineCodeBracket, HiOutlineDocumentArrowUp, HiOutlinePlus, HiOutlineMagnifyingGlass } from 'react-icons/hi2';
+import { HiOutlineCodeBracket, HiOutlineDocumentArrowUp, HiOutlinePlus, HiOutlineMagnifyingGlass, HiOutlineTrash, HiOutlineChevronDown } from 'react-icons/hi2';
 
 import CodeEditor from '../components/code/CodeEditor';
 import FileUploader from '../components/code/FileUploader';
 import LanguageSelector from '../components/code/LanguageSelector';
-import { listProjectsAPI, createProjectAPI, submitSnippetAPI, uploadFilesAPI } from '../api/analysis';
+import { listProjectsAPI, createProjectAPI, deleteProjectAPI, submitSnippetAPI, uploadFilesAPI } from '../api/analysis';
 
 export default function NewReviewPage() {
   const navigate = useNavigate();
@@ -25,6 +25,19 @@ export default function NewReviewPage() {
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+  const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+
+  const projectDropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (projectDropdownRef.current && !projectDropdownRef.current.contains(event.target)) {
+        setShowProjectDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Query: Fetch projects
   const { data: projectsData, isLoading: isLoadingProjects } = useQuery({
@@ -50,6 +63,24 @@ export default function NewReviewPage() {
     },
     onError: (error) => {
       const errorMsg = error.response?.data?.error?.message || 'Failed to create project.';
+      toast.error(errorMsg);
+    },
+  });
+
+  // Mutation: Delete a project
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (id) => {
+      return await deleteProjectAPI(id);
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['projects']);
+      if (selectedProjectId === variables) {
+        setSelectedProjectId('');
+      }
+      toast.success('Project deleted successfully!');
+    },
+    onError: (error) => {
+      const errorMsg = error.response?.data?.error?.message || 'Failed to delete project.';
       toast.error(errorMsg);
     },
   });
@@ -224,25 +255,88 @@ export default function NewReviewPage() {
                 </div>
               </form>
             ) : (
-              <div className="flex flex-col gap-2">
-                <select
-                  value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
+              <div className="flex flex-col gap-2 relative" ref={projectDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowProjectDropdown((prev) => !prev)}
                   disabled={isLoadingProjects}
-                  className="w-full px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-accent)] cursor-pointer"
-                  style={{ color: 'var(--color-text)' }}
+                  className="w-full flex items-center justify-between px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-accent)] cursor-pointer text-left text-white transition-all duration-200"
                 >
-                  <option value="">-- Select Project --</option>
-                  {projectsData?.map((project) => (
-                    <option key={project.id} value={project.id}>
-                      {project.projectName}
-                    </option>
-                  ))}
-                </select>
+                  <span className="truncate">
+                    {selectedProjectId
+                      ? projectsData?.find((p) => p.id === selectedProjectId)?.projectName || '-- Select Project --'
+                      : '-- Select Project --'}
+                  </span>
+                  <HiOutlineChevronDown className={`w-4 h-4 text-[var(--color-text-muted)] transition-transform duration-200 ${showProjectDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showProjectDropdown && (
+                  <div
+                    className="absolute left-0 w-full rounded-xl border p-1 glass z-50 text-left shadow-2xl animate-fade-in max-h-60 overflow-y-auto"
+                    style={{
+                      top: '105%',
+                      borderColor: 'var(--color-border)',
+                      backgroundColor: 'rgba(15, 23, 42, 0.98)',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedProjectId('');
+                        setShowProjectDropdown(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors cursor-pointer"
+                    >
+                      -- Select Project --
+                    </button>
+
+                    {projectsData && projectsData.length > 0 ? (
+                      projectsData.map((project) => (
+                        <div
+                          key={project.id}
+                          className="flex items-center justify-between hover:bg-[var(--color-surface-hover)] rounded-lg group transition-colors"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedProjectId(project.id);
+                              setShowProjectDropdown(false);
+                            }}
+                            className="flex-1 text-left px-3 py-2 text-sm text-[var(--color-text)] hover:text-white cursor-pointer truncate"
+                          >
+                            {project.projectName}
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Are you sure you want to delete "${project.projectName}"? All associated reviews will be permanently deleted.`)) {
+                                deleteProjectMutation.mutate(project.id);
+                              }
+                            }}
+                            disabled={deleteProjectMutation.isPending}
+                            className="p-2 mr-1 text-[var(--color-text-muted)] hover:text-[var(--color-error)] hover:bg-[var(--color-error-muted)] rounded-md transition-all duration-200 cursor-pointer opacity-100 sm:opacity-0 group-hover:opacity-100"
+                            title={`Delete ${project.projectName}`}
+                          >
+                            <HiOutlineTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-xs text-[var(--color-text-muted)] italic">
+                        No projects created yet.
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <button
                   type="button"
-                  onClick={() => setIsCreatingProject(true)}
+                  onClick={() => {
+                    setIsCreatingProject(true);
+                    setShowProjectDropdown(false);
+                  }}
                   className="flex items-center justify-center gap-1.5 w-full py-2 border border-dashed border-[var(--color-border)] hover:border-[var(--color-accent-hover)] hover:text-white text-[var(--color-text-secondary)] rounded-xl text-xs transition-colors duration-200 cursor-pointer"
                 >
                   <HiOutlinePlus className="w-3.5 h-3.5" />
