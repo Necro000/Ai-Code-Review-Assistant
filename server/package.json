@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "npx prisma db push && node server.js",
+    "start": "npx prisma db push --accept-data-loss && node server.js",
     "postinstall": "prisma generate",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev",

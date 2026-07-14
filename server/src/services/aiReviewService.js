@@ -65,8 +65,8 @@ const checkDailyQuotas = async (estimatedTokens) => {
     dailyTokensUsed += Math.ceil((codeLen + summaryLen) / 4) + baseTokensPerRequest;
   });
 
-  if (dailyTokensUsed + estimatedTokens > 100000) {
-    throw new AppError('Daily AI token quota exceeded (Max 100,000 tokens/day). Please try again tomorrow.', 429, 'DAILY_LIMIT_EXCEEDED');
+  if (dailyTokensUsed + estimatedTokens > 2000000) {
+    throw new AppError('Daily AI token quota exceeded (Max 2,000,000 tokens/day). Please try again tomorrow.', 429, 'DAILY_LIMIT_EXCEEDED');
   }
 };
 
@@ -80,8 +80,8 @@ const throttleMinuteLimits = async (estimatedTokens) => {
   while (true) {
     const { count, tokens } = getSlidingTotals();
 
-    // 30 RPM and 1K (1,000) TPM limit checks
-    if (count < 30 && tokens + estimatedTokens <= 1000) {
+    // 30 RPM and 40K (40,000) TPM limit checks
+    if (count < 30 && tokens + estimatedTokens <= 40000) {
       break;
     }
 
@@ -157,9 +157,9 @@ const getAIReview = async (code, language, staticFindings) => {
   const fullPromptText = systemPrompt + userPrompt;
   const estimatedTokens = estimateTokens(fullPromptText, 300); // Expect ~300 token response
 
-  // 2. Fail fast if a single request's code size exceeds the 1K minute limit
-  if (estimatedTokens > 1000) {
-    throw new AppError('The code is too long for the active model token limit (Max ~1,500 characters of code). Please submit a smaller snippet.', 400, 'CODE_TOO_LARGE');
+  // 2. Fail fast if a single request's code size exceeds the 8K model token limit
+  if (estimatedTokens > 8000) {
+    throw new AppError('The code is too long for the active model token limit (Max ~28,000 characters of code). Please submit a smaller snippet.', 400, 'CODE_TOO_LARGE');
   }
 
   // 3. Enforce Daily Limit (12K requests, 100K tokens)
