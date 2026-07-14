@@ -1,6 +1,8 @@
 const app = require('./src/app');
+const http = require('http');
 const { PORT, NODE_ENV } = require('./src/config/env');
 const { connectDB, disconnectDB } = require('./src/config/db');
+const socketConfig = require('./src/config/socket');
 
 /**
  * Start the server.
@@ -9,8 +11,12 @@ async function startServer() {
   // Connect to database
   await connectDB();
 
+  // Create HTTP server and initialize Socket.io
+  const server = http.createServer(app);
+  socketConfig.init(server);
+
   // Start listening
-  const server = app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`\n🚀 Server running on http://localhost:${PORT}`);
     console.log(`📋 Environment: ${NODE_ENV}`);
     console.log(`❤️  Health check: http://localhost:${PORT}/api/health\n`);

@@ -7,18 +7,30 @@ import {
   HiOutlineUser,
   HiOutlineChevronLeft,
   HiOutlinePlusCircle,
+  HiOutlineUserGroup,
+  HiOutlineCpuChip,
+  HiOutlineTrophy,
 } from 'react-icons/hi2';
-
-const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: HiOutlineHome },
-  { path: '/review/new', label: 'New Review', icon: HiOutlinePlusCircle },
-  { path: '/history', label: 'History', icon: HiOutlineClock },
-  { path: '/profile', label: 'Profile', icon: HiOutlineUser },
-];
+import useAuth from '../../hooks/useAuth';
 
 export default function Sidebar() {
+  const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+
+  const navItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: HiOutlineHome },
+    { path: '/review/new', label: 'New Review', icon: HiOutlinePlusCircle },
+    { path: '/history', label: 'History', icon: HiOutlineClock },
+    { path: '/pr/review', label: 'PR Review', icon: HiOutlineCodeBracket },
+    { path: '/workspace', label: 'Workspaces', icon: HiOutlineUserGroup },
+    { path: '/leaderboard', label: 'Leaderboard', icon: HiOutlineTrophy },
+    { path: '/profile', label: 'Profile', icon: HiOutlineUser },
+  ];
+
+  if (user?.role === 'admin') {
+    navItems.push({ path: '/admin', label: 'Admin Panel', icon: HiOutlineCpuChip });
+  }
 
   return (
     <aside

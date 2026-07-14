@@ -8,13 +8,17 @@ import ReviewHeader from '../components/review/ReviewHeader';
 import ComplexityPanel from '../components/review/ComplexityPanel';
 import CodeDisplay from '../components/review/CodeDisplay';
 import FindingsList from '../components/review/FindingsList';
+import RefactoringPanel from '../components/review/RefactoringPanel';
 import { getReviewAPI, deleteReviewAPI } from '../api/reviews';
+import useCollaboration from '../hooks/useCollaboration';
+import CollaboratorsBar from '../components/review/CollaboratorsBar';
 
 export default function ReviewDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [highlightedLine, setHighlightedLine] = useState(null);
+  const collaborators = useCollaboration(id);
 
   // Query: Fetch review details
   const { data: reviewData, isLoading, error } = useQuery({
@@ -82,18 +86,23 @@ export default function ReviewDetailPage() {
   }
 
   const review = reviewData;
+  const refactoringTips = (review.findings || []).filter((f) => f.rule === 'refactoring-tip');
+  const codeFindings = (review.findings || []).filter((f) => f.rule !== 'refactoring-tip');
 
   return (
     <div className="space-y-6">
       {/* Top action bar */}
       <div className="flex items-center justify-between border-b pb-4 border-[var(--color-border)]">
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-200 cursor-pointer"
-        >
-          <HiOutlineArrowLeft className="w-4 h-4" />
-          Back to Dashboard
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-200 cursor-pointer"
+          >
+            <HiOutlineArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </button>
+          <CollaboratorsBar users={collaborators} />
+        </div>
 
         <button
           onClick={handleDelete}
@@ -124,9 +133,12 @@ export default function ReviewDetailPage() {
 
         {/* Issue Cards */}
         <div className="lg:col-span-1">
-          <FindingsList findings={review.findings || []} onJump={handleLineJump} />
+          <FindingsList findings={codeFindings} onJump={handleLineJump} />
         </div>
       </div>
+
+      {/* AI Refactoring Suggestions */}
+      <RefactoringPanel tips={refactoringTips} />
     </div>
   );
 }

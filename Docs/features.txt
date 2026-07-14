@@ -1,0 +1,15 @@
+Bonus Features 
+Multi-language support (JavaScript, Python, Java, C++, etc.)
+GitHub OAuth login
+Pull Request review integration
+Team workspaces
+Real-time collaboration
+AI-powered refactoring suggestions
+Code quality scoring (0–100)
+Interactive charts and analytics
+Dark and Light themes
+Email notifications after review completion
+CI/CD integration (GitHub Actions)
+Docker support
+Admin dashboard
+Leaderboard for code quality improvement

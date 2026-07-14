@@ -268,6 +268,30 @@ const getDashboardStats = async (userId) => {
   // Reverse to make chronological for line charts
   const scoreTrend = recentReviews.reverse();
 
+  // 4. Fetch reviews grouped by language
+  const languageGroups = await prisma.review.groupBy({
+    by: ['language'],
+    where: {
+      project: {
+        userId,
+      },
+    },
+    _count: {
+      id: true,
+    },
+    orderBy: {
+      _count: {
+        id: 'desc',
+      },
+    },
+    take: 8,
+  });
+
+  const languageBreakdown = languageGroups.map((g) => ({
+    language: g.language || 'unknown',
+    count: g._count.id,
+  }));
+
   return {
     totalReviews,
     averageScore,
@@ -275,6 +299,7 @@ const getDashboardStats = async (userId) => {
     cleanPasses: cleanPassesCount,
     severityBreakdown,
     scoreTrend,
+    languageBreakdown,
   };
 };
 

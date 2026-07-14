@@ -186,6 +186,175 @@ const runPylint = async (code) => {
 };
 
 /**
+ * Normalizes Checkstyle XML output format to standard envelope.
+ */
+const normalizeCheckstyleResults = (xmlString) => {
+  const findings = [];
+  if (!xmlString) return findings;
+
+  const errorRegex = /<error\s+line="(\d+)"\s*(?:column="(\d+)"\s*)?severity="([^"]+)"\s+message="([^"]+)"\s+source="([^"]+)"/g;
+  let match;
+  while ((match = errorRegex.exec(xmlString)) !== null) {
+    const line = parseInt(match[1], 10) || 1;
+    const col = parseInt(match[2], 10) || 1;
+    let severity = 'warning';
+    if (match[3] === 'error') {
+      severity = 'error';
+    } else if (match[3] === 'info') {
+      severity = 'info';
+    }
+
+    findings.push({
+      source: 'checkstyle',
+      severity,
+      rule: match[5].split('.').pop() || 'checkstyle-rule',
+      issue: match[4],
+      explanation: match[4],
+      suggestedFix: null,
+      lineNumber: line,
+      column: col,
+    });
+  }
+  return findings;
+};
+
+/**
+ * Normalizes Cppcheck XML output format to standard envelope.
+ */
+const normalizeCppcheckResults = (xmlString) => {
+  const findings = [];
+  if (!xmlString) return findings;
+
+  const errorBlockRegex = /<error\s+id="([^"]+)"\s+severity="([^"]+)"\s+msg="([^"]+)"[^>]*>([\s\S]*?)<\/error>/g;
+  let match;
+  while ((match = errorBlockRegex.exec(xmlString)) !== null) {
+    const rule = match[1];
+    let severity = 'warning';
+    if (match[2] === 'error') {
+      severity = 'error';
+    } else if (match[2] === 'style' || match[2] === 'performance' || match[2] === 'portability') {
+      severity = 'warning';
+    } else if (match[2] === 'information') {
+      severity = 'info';
+    }
+
+    const explanation = match[3];
+    const locRegex = /<location\s+[^>]*line="(\d+)"[^>]*\/>/;
+    const locMatch = locRegex.exec(match[4]);
+    const line = locMatch ? parseInt(locMatch[1], 10) : 1;
+
+    findings.push({
+      source: 'cppcheck',
+      severity,
+      rule,
+      issue: explanation,
+      explanation,
+      suggestedFix: null,
+      lineNumber: line,
+      column: 1,
+    });
+  }
+  return findings;
+};
+
+/**
+ * Runs Checkstyle on Java code.
+ */
+const runCheckstyle = async (code) => {
+  const filename = `${uuidv4()}.java`;
+  const filepath = path.join(tempDir, filename);
+
+  await fs.writeFile(filepath, code, 'utf8');
+
+  try {
+    const jarPath = process.env.CHECKSTYLE_JAR || 'checkstyle.jar';
+    const cmd = `java -jar "${jarPath}" -c /google_checks.xml -f xml "${filepath}"`;
+
+    let stdout = '';
+    try {
+      const result = await execAsync(cmd, { timeout: 30000, shell: true });
+      stdout = result.stdout;
+    } catch (execError) {
+      if (execError.stdout) {
+        stdout = execError.stdout;
+      } else {
+        throw execError;
+      }
+    }
+
+    return normalizeCheckstyleResults(stdout);
+  } catch (error) {
+    console.warn('⚠️ Checkstyle execution issue:', error.message);
+    return [
+      {
+        source: 'checkstyle',
+        severity: 'info',
+        rule: 'checkstyle-error',
+        issue: 'Static check skipped.',
+        explanation: 'Checkstyle linter was unable to analyze this code or Java is not installed.',
+        suggestedFix: null,
+        lineNumber: 1,
+        column: 1,
+      },
+    ];
+  } finally {
+    try {
+      await fs.unlink(filepath);
+    } catch (e) {
+      // ignore
+    }
+  }
+};
+
+/**
+ * Runs Cppcheck on C/C++ code.
+ */
+const runCppcheck = async (code) => {
+  const filename = `${uuidv4()}.cpp`;
+  const filepath = path.join(tempDir, filename);
+
+  await fs.writeFile(filepath, code, 'utf8');
+
+  try {
+    const cmd = `cppcheck --enable=all --xml "${filepath}"`;
+
+    let stderr = '';
+    try {
+      const result = await execAsync(cmd, { timeout: 30000, shell: true });
+      stderr = result.stderr;
+    } catch (execError) {
+      if (execError.stderr) {
+        stderr = execError.stderr;
+      } else {
+        throw execError;
+      }
+    }
+
+    return normalizeCppcheckResults(stderr);
+  } catch (error) {
+    console.warn('⚠️ Cppcheck execution issue:', error.message);
+    return [
+      {
+        source: 'cppcheck',
+        severity: 'info',
+        rule: 'cppcheck-error',
+        issue: 'Static check skipped.',
+        explanation: 'Cppcheck was unable to analyze this code or cppcheck binary is not installed.',
+        suggestedFix: null,
+        lineNumber: 1,
+        column: 1,
+      },
+    ];
+  } finally {
+    try {
+      await fs.unlink(filepath);
+    } catch (e) {
+      // ignore
+    }
+  }
+};
+
+/**
  * Main Static Analysis Router — dispatches to the correct linter by language.
  */
 const analyzeCode = async (code, language) => {
@@ -197,6 +366,10 @@ const analyzeCode = async (code, language) => {
     return await runESLint(code);
   } else if (lang === 'python') {
     return await runPylint(code);
+  } else if (lang === 'java') {
+    return await runCheckstyle(code);
+  } else if (lang === 'c/cpp' || lang === 'cpp' || lang === 'c') {
+    return await runCppcheck(code);
   }
 
   // No linter available for this language

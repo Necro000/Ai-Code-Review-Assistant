@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { HiOutlineCodeBracketSquare, HiOutlineBell, HiOutlineCheck } from 'react-icons/hi2';
+import { HiOutlineCodeBracketSquare, HiOutlineBell, HiOutlineCheck, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function Navbar() {
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const initials = user?.name ? user.name[0].toUpperCase() : 'U';
   const displayName = user?.name ? user.name.split(' ')[0] : 'User';
@@ -59,9 +61,7 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 border-b"
       style={{
         height: 'var(--navbar-height)',
-        backgroundColor: 'rgba(10, 14, 26, 0.8)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        backgroundColor: 'var(--color-bg-secondary)',
         borderColor: 'var(--color-border)',
       }}
     >
@@ -88,6 +88,19 @@ export default function Navbar() {
 
       {/* Right Section */}
       <div className="flex items-center gap-2 relative" ref={dropdownRef}>
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 cursor-pointer text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-hover)]"
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? (
+            <HiOutlineSun className="w-5 h-5" />
+          ) : (
+            <HiOutlineMoon className="w-5 h-5" />
+          )}
+        </button>
+
         {/* Notifications */}
         <button
           onClick={toggleNotifications}
@@ -119,7 +132,7 @@ export default function Navbar() {
             style={{
               top: 'var(--navbar-height)',
               borderColor: 'var(--color-border)',
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+              backgroundColor: 'var(--color-bg-secondary)',
             }}
           >
             <div

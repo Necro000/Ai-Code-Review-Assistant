@@ -21,9 +21,14 @@ model User {
   name      String   @db.VarChar(50)
   email     String   @unique @db.VarChar(255)
   password  String   @db.VarChar(255)
+  githubId  String?  @unique @map("github_id")        // Feature: GitHub OAuth
+  avatarUrl String?  @map("avatar_url")               // Feature: GitHub OAuth
+  role      String   @db.VarChar(20) @default("user") // Feature: Admin ("user"|"admin")
   createdAt DateTime @default(now()) @map("created_at")
 
   projects Project[]
+  ownedWorkspaces      Workspace[]       @relation("WorkspaceOwner")
+  workspaceMemberships WorkspaceMember[]
 
   @@map("users")
 }
@@ -34,10 +39,12 @@ model Project {
   userId      String   @map("user_id")
   projectName String   @map("project_name") @db.VarChar(100)
   githubUrl   String?  @map("github_url") @db.VarChar(500)
+  workspaceId String?  @map("workspace_id") // nullable — solo use unchanged
   createdAt   DateTime @default(now()) @map("created_at")
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviews Review[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  reviews   Review[]
 
   @@index([userId])
   @@map("projects")
@@ -81,4 +88,31 @@ model ReviewFinding {
   @@index([reviewId])
   @@index([severity])
   @@map("review_findings")
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  owner    User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members  WorkspaceMember[]
+  projects Project[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  role        String   @db.VarChar(20) @default("member") // "owner" | "member"
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
 }

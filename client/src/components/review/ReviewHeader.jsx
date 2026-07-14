@@ -1,17 +1,7 @@
+import ScoreBadge from './ScoreBadge';
+
 export default function ReviewHeader({ review }) {
   const score = review.overallScore;
-
-  const getScoreColor = (s) => {
-    if (s >= 80) return 'var(--color-success)';
-    if (s >= 50) return 'var(--color-warning)';
-    return 'var(--color-error)';
-  };
-
-  const getScoreText = (s) => {
-    if (s >= 80) return 'Excellent';
-    if (s >= 50) return 'Needs Work';
-    return 'Critical';
-  };
 
   return (
     <div
@@ -20,40 +10,7 @@ export default function ReviewHeader({ review }) {
     >
       {/* Score Circle Progress */}
       <div className="flex flex-col sm:flex-row gap-4 items-center">
-        <div className="relative flex items-center justify-center w-24 h-24 flex-shrink-0">
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-            {/* Background Circle */}
-            <path
-              className="text-[var(--color-border)]"
-              strokeWidth="3.5"
-              stroke="currentColor"
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            {/* Progress Circle */}
-            <path
-              className="transition-all duration-1000 ease-out"
-              strokeDasharray={`${score || 0}, 100`}
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              stroke={getScoreColor(score || 0)}
-              fill="none"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-          </svg>
-          {/* Inner Text */}
-          <div className="absolute flex flex-col items-center justify-center">
-            <span className="text-2xl font-black text-white">{score !== null ? score : 'N/A'}</span>
-            {score !== null && (
-              <span
-                className="text-[8px] font-bold uppercase tracking-wider"
-                style={{ color: getScoreColor(score) }}
-              >
-                {getScoreText(score)}
-              </span>
-            )}
-          </div>
-        </div>
+        <ScoreBadge score={score} size={96} />
 
         {/* Metadata Details */}
         <div className="text-center sm:text-left space-y-1">

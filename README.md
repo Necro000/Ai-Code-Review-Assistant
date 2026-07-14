@@ -119,6 +119,31 @@ Visit `http://localhost:5173` in your browser.
 
 ---
 
+## 🐳 Containerized Deployment (Docker)
+
+You can launch the entire stack (PostgreSQL database, backend REST API, and Nginx client frontend) inside Docker containers.
+
+### Run with Docker Compose
+1. Ensure your environment configurations are populated in `server/.env` (database connection credentials will be automatically overridden by Docker service links).
+2. Launch the services from the project root directory:
+   ```bash
+   docker compose up -d --build
+   ```
+3. The services are mapped as follows:
+   - **Frontend App**: `http://localhost` (Port 80)
+   - **Backend API**: `http://localhost:5000` (Port 5000)
+
+---
+
+## 🛠️ CI/CD Deployment Pipelines
+
+We use GitHub Actions to automate code validation and Docker deployments.
+
+- **CI Workflows (`ci.yml`)**: Lint the server code, perform schema validation on the Prisma DB definition, and ensure the React application compiles without errors. This runs on every push and pull request targeting the `main` branch.
+- **CD Workflows (`deploy.yml`)**: Auto-builds both client and server images on push to the `main` branch, tags and pushes them to **GitHub Container Registry (GHCR)**, and triggers a redeployment webhook to **Render**.
+
+---
+
 ## 🔒 Security Best Practices Implemented
 
 * **No Plaintext Code Storage**: Files uploaded to the server are parsed temporarily in memory or `/tmp` directories and permanently unlinked right after evaluation.

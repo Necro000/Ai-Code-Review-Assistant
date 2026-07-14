@@ -3,6 +3,7 @@ const staticAnalysis = require('./staticAnalysisService');
 const aiReview = require('./aiReviewService');
 const complexityAnalysis = require('./complexityService');
 const AppError = require('../utils/AppError');
+const scoringService = require('./scoringService');
 
 /**
  * Maps static analysis linter findings to database format.
@@ -112,8 +113,25 @@ const mapAIFindings = (aiReport, fileName) => {
     });
   }
 
+  // 6. Refactoring Tips
+  if (Array.isArray(aiReport.refactoring_tips)) {
+    aiReport.refactoring_tips.forEach((tip, index) => {
+      dbFindings.push({
+        source: 'ai',
+        severity: 'info',
+        rule: 'refactoring-tip',
+        issue: `Refactoring Suggestion ${index + 1}: ${tip}`,
+        explanation: tip,
+        suggestedFix: null,
+        fileName,
+        lineNumber: null,
+        column: null,
+      });
+    });
+  }
+
   return dbFindings;
-};
+}
 
 /**
  * Coordinate full multi-stage code review pipeline.
@@ -155,18 +173,22 @@ const runCodeAnalysis = async (code, language, projectId, fileName = 'snippet.tx
     }
   }
 
-  // Combine results
-  const overallScore = aiReport.overall_score !== undefined ? aiReport.overall_score : 80;
+  // Formulate the database nested list of findings
+  const staticDbFindings = mapStaticFindings(staticFindings, fileName);
+  const aiDbFindings = mapAIFindings(aiReport, fileName);
+  const allFindings = [...staticDbFindings, ...aiDbFindings];
+
+  // Combine results with penalty-adjusted score
+  const { score: overallScore } = scoringService.computeScore(
+    aiReport.overall_score,
+    staticFindings,
+    allFindings
+  );
   const summary = aiReport.summary || 'Code review completed with minor linter warnings.';
   
   // Format description of complexity to append to AI summary (satisfying Phase 4 summary requirements)
   const complexityText = `\n\n**Complexity Metrics:**\nLines of Code: ${complexity.linesOfCode} | Cyclomatic Complexity: ${complexity.cyclomaticComplexity} (${complexity.complexityRating}).`;
   const enrichedSummary = `${summary}${complexityText}`;
-
-  // Formulate the database nested list of findings
-  const staticDbFindings = mapStaticFindings(staticFindings, fileName);
-  const aiDbFindings = mapAIFindings(aiReport, fileName);
-  const allFindings = [...staticDbFindings, ...aiDbFindings];
 
   // Save the full transaction report to database
   const review = await prisma.review.create({

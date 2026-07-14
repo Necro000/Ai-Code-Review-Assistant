@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { HiOutlinePlusCircle, HiOutlineCodeBracket, HiOutlineArrowRight } from 'react-icons/hi2';
 
 import StatsCards from '../components/dashboard/StatsCards';
-import ScoreChart from '../components/dashboard/ScoreChart';
+import ScoreTrendLine from '../components/dashboard/ScoreTrendLine';
+import SeverityDonut from '../components/dashboard/SeverityDonut';
+import LanguageBarChart from '../components/dashboard/LanguageBarChart';
 import RecentReviews from '../components/dashboard/RecentReviews';
 import { getStatsAPI, listReviewsAPI } from '../api/reviews';
 
@@ -115,15 +117,23 @@ export default function DashboardPage() {
       <StatsCards stats={stats} />
 
       {hasReviews ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          {/* Recent Reviews Table */}
-          <div className="lg:col-span-2">
-            <RecentReviews reviews={reviews} />
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {/* Recent Reviews Table */}
+            <div className="lg:col-span-2">
+              <RecentReviews reviews={reviews} />
+            </div>
+
+            {/* Performance Line Chart */}
+            <div className="lg:col-span-1">
+              <ScoreTrendLine trend={stats.scoreTrend} />
+            </div>
           </div>
 
-          {/* Performance Line Chart */}
-          <div className="lg:col-span-1">
-            <ScoreChart trend={stats.scoreTrend} />
+          {/* Finding severity and language bar distribution metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SeverityDonut breakdown={stats.severityBreakdown} />
+            <LanguageBarChart breakdown={stats.languageBreakdown} />
           </div>
         </div>
       ) : (

@@ -3,6 +3,7 @@ const { prisma } = require('../config/db');
 const { runCodeAnalysis } = require('../services/analysisOrchestrator');
 const { sendSuccess } = require('../utils/responseFormatter');
 const AppError = require('../utils/AppError');
+const emailService = require('../services/emailService');
 
 /**
  * Submit Code Snippet Controller
@@ -34,11 +35,16 @@ const submitSnippet = async (req, res, next) => {
       processed.fileName
     );
 
-    return sendSuccess(res, {
+    sendSuccess(res, {
       data: { review, complexity },
       message: 'Code analysis completed successfully',
       statusCode: 201,
     });
+
+    if (req.userEmail) {
+      emailService.sendReviewCompleteEmail(req.userEmail, review).catch(console.error);
+    }
+    return;
   } catch (error) {
     next(error);
   }
@@ -78,11 +84,18 @@ const uploadFiles = async (req, res, next) => {
       results.push({ review, complexity });
     }
 
-    return sendSuccess(res, {
+    sendSuccess(res, {
       data: { reviews: results },
       message: `${processedFiles.length} file(s) processed and analyzed successfully`,
       statusCode: 201,
     });
+
+    if (req.userEmail) {
+      for (const resItem of results) {
+        emailService.sendReviewCompleteEmail(req.userEmail, resItem.review).catch(console.error);
+      }
+    }
+    return;
   } catch (error) {
     next(error);
   }

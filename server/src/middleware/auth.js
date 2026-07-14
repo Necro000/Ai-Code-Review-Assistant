@@ -25,15 +25,17 @@ const verifyToken = async (req, res, next) => {
     // Verify user exists in the database
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true },
+      select: { id: true, email: true, role: true },
     });
 
     if (!user) {
       return next(new AppError('User belonging to this token no longer exists.', 401, 'USER_NOT_FOUND'));
     }
 
-    // Grant access and attach user ID
+    // Grant access and attach user details
     req.userId = user.id;
+    req.userEmail = user.email;
+    req.userRole = user.role;
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {

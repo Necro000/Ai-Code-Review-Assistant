@@ -13,6 +13,9 @@ const requiredVars = [
   'JWT_SECRET',
   'JWT_REFRESH_SECRET',
   'GROQ_API_KEY',
+  'GITHUB_CLIENT_ID',
+  'GITHUB_CLIENT_SECRET',
+  'SESSION_SECRET',
 ];
 
 const missing = requiredVars.filter((key) => !process.env[key]);
@@ -35,4 +38,14 @@ module.exports = {
   GROQ_API_KEY: process.env.GROQ_API_KEY,
   GROQ_MODEL: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  SERVER_URL: process.env.SERVER_URL || 'http://localhost:5000',
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+  SESSION_SECRET: process.env.SESSION_SECRET,
+  GITHUB_ACCESS_TOKEN: process.env.GITHUB_ACCESS_TOKEN,
+  SMTP_HOST: process.env.SMTP_HOST,
+  SMTP_PORT: process.env.SMTP_PORT,
+  SMTP_USER: process.env.SMTP_USER,
+  SMTP_PASS: process.env.SMTP_PASS,
+  SMTP_FROM: process.env.SMTP_FROM,
 };

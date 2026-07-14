@@ -35,9 +35,18 @@ export function AuthProvider({ children }) {
     }
   }, [clearAuth]);
 
-  // Initial session check on mount (Stateless token refresh)
+  // Initial session check on mount (Stateless token refresh + OAuth handle)
   useEffect(() => {
     const initAuth = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token');
+      if (urlToken) {
+        localStorage.setItem('accessToken', urlToken);
+        setAccessToken(urlToken);
+        // Clean URL to remove token
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
       const localToken = localStorage.getItem('accessToken');
       if (localToken) {
         setAccessToken(localToken);

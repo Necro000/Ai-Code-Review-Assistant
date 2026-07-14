@@ -4,6 +4,7 @@ import {
   HiOutlineExclamationTriangle,
   HiOutlineChartBar,
 } from 'react-icons/hi2';
+import ScoreBadge from '../review/ScoreBadge';
 
 export default function StatsCards({ stats }) {
   const cards = [
@@ -58,12 +59,16 @@ export default function StatsCards({ stats }) {
                   {card.value}
                 </p>
               </div>
-              <div
-                className="flex items-center justify-center w-10 h-10 rounded-lg"
-                style={{ backgroundColor: card.bgColor }}
-              >
-                <Icon className="w-5 h-5" style={{ color: card.color }} />
-              </div>
+              {card.label === 'Average Score' && stats?.averageScore ? (
+                <ScoreBadge score={stats.averageScore} size={48} />
+              ) : (
+                <div
+                  className="flex items-center justify-center w-10 h-10 rounded-lg"
+                  style={{ backgroundColor: card.bgColor }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: card.color }} />
+                </div>
+              )}
             </div>
           </div>
         );

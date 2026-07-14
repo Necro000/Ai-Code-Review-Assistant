@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const passport = require('passport');
 const { errorHandler } = require('./middleware/errorHandler');
-const { CLIENT_URL } = require('./config/env');
+const env = require('./config/env');
 const { sendSuccess } = require('./utils/responseFormatter');
 
 const app = express();
@@ -12,7 +14,7 @@ const app = express();
 // ---------------------
 
 // Trim trailing slash from CLIENT_URL if present to prevent CORS mismatches
-const corsOrigin = CLIENT_URL && CLIENT_URL.endsWith('/') ? CLIENT_URL.slice(0, -1) : CLIENT_URL;
+const corsOrigin = env.CLIENT_URL && env.CLIENT_URL.endsWith('/') ? env.CLIENT_URL.slice(0, -1) : env.CLIENT_URL;
 
 // CORS — allow frontend origin with credentials (cookies)
 app.use(cors({
@@ -30,6 +32,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // Parse cookies (for refresh tokens)
 app.use(cookieParser());
+
+// Express Session (required for Passport)
+app.use(session({
+  secret: env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Disable X-Powered-By header (security)
 app.disable('x-powered-by');
@@ -52,10 +70,15 @@ app.get('/api/health', (req, res) => {
 
 // Route mounting
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', require('./routes/oauthRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/analysis', require('./routes/analysisRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/workspaces', require('./routes/workspaceRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/pr', require('./routes/prRoutes'));
+app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 
 // ---------------------
 // Error Handling
