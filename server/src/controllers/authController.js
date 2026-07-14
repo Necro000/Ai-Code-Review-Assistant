@@ -42,7 +42,7 @@ const login = async (req, res, next) => {
     setRefreshTokenCookie(res, refreshToken);
 
     return sendSuccess(res, {
-      data: { accessToken, user },
+      data: { accessToken, refreshToken, user },
       message: 'Logged in successfully',
     });
   } catch (error) {
@@ -61,7 +61,7 @@ const refreshToken = async (req, res, next) => {
     const { accessToken } = await authService.refreshUserToken(token);
 
     return sendSuccess(res, {
-      data: { accessToken },
+      data: { accessToken, refreshToken: token },
       message: 'Token refreshed successfully',
     });
   } catch (error) {
