@@ -23,6 +23,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   }, []);
 
   // Fetch profile when access token is set or refreshed
@@ -56,8 +57,12 @@ export function AuthProvider({ children }) {
         } catch (err) {
           // Access token might have expired. Try to refresh.
           try {
-            const { data } = await api.post('/auth/refresh');
+            const savedRefreshToken = localStorage.getItem('refreshToken');
+            const { data } = await api.post('/auth/refresh', { refreshToken: savedRefreshToken });
             localStorage.setItem('accessToken', data.data.accessToken);
+            if (data.data.refreshToken) {
+              localStorage.setItem('refreshToken', data.data.refreshToken);
+            }
             setAccessToken(data.data.accessToken);
             const userResponse = await getProfileAPI();
             setUser(userResponse.data.user);
@@ -66,10 +71,14 @@ export function AuthProvider({ children }) {
           }
         }
       } else {
-        // No token in memory, try refreshing via HTTPOnly Cookie
+        // No token in memory, try refreshing via HTTPOnly Cookie / localStorage fallback
         try {
-          const { data } = await api.post('/auth/refresh');
+          const savedRefreshToken = localStorage.getItem('refreshToken');
+          const { data } = await api.post('/auth/refresh', { refreshToken: savedRefreshToken });
           localStorage.setItem('accessToken', data.data.accessToken);
+          if (data.data.refreshToken) {
+            localStorage.setItem('refreshToken', data.data.refreshToken);
+          }
           setAccessToken(data.data.accessToken);
           const userResponse = await getProfileAPI();
           setUser(userResponse.data.user);
@@ -89,7 +98,11 @@ export function AuthProvider({ children }) {
     try {
       const response = await loginAPI(email, password);
       const token = response.data.accessToken;
+      const refresh = response.data.refreshToken;
       localStorage.setItem('accessToken', token);
+      if (refresh) {
+        localStorage.setItem('refreshToken', refresh);
+      }
       setAccessToken(token);
       setUser(response.data.user);
       toast.success(response.message || 'Logged in successfully!');

@@ -34,18 +34,24 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
+        const savedRefreshToken = localStorage.getItem('refreshToken');
         const { data } = await axios.post(
           `${API_BASE_URL}/api/auth/refresh`,
-          {},
+          { refreshToken: savedRefreshToken },
           { withCredentials: true }
         );
 
         localStorage.setItem('accessToken', data.data.accessToken);
+        if (data.data.refreshToken) {
+          localStorage.setItem('refreshToken', data.data.refreshToken);
+        }
+        
         originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed — clear auth and redirect to login
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
