@@ -13,9 +13,6 @@ const requiredVars = [
   'JWT_SECRET',
   'JWT_REFRESH_SECRET',
   'GROQ_API_KEY',
-  'GITHUB_CLIENT_ID',
-  'GITHUB_CLIENT_SECRET',
-  'SESSION_SECRET',
 ];
 
 const missing = requiredVars.filter((key) => !process.env[key]);

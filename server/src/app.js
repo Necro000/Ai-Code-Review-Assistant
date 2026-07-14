@@ -35,7 +35,7 @@ app.use(cookieParser());
 
 // Express Session (required for Passport)
 app.use(session({
-  secret: env.SESSION_SECRET,
+  secret: env.SESSION_SECRET || 'fallback_session_secret_at_least_32_characters_long',
   resave: false,
   saveUninitialized: false,
   cookie: {
