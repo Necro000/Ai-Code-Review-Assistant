@@ -9,6 +9,9 @@ const { sendSuccess } = require('./utils/responseFormatter');
 
 const app = express();
 
+// Trust proxy settings for secure cookie and rate limits behind Nginx/Cloudflare load balancers
+app.set('trust proxy', 1);
+
 // ---------------------
 // Global Middleware
 // ---------------------

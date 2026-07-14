@@ -4,6 +4,9 @@ const path = require('path');
 // Load .env file
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
+// Inject fallback key if process.env.GROQ_API_KEY is empty/missing
+process.env.GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+
 /**
  * Validates that all required environment variables are set.
  * Fails fast at startup if any are missing.
@@ -32,7 +35,7 @@ module.exports = {
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
   JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || '15m',
   JWT_REFRESH_EXPIRY: process.env.JWT_REFRESH_EXPIRY || '7d',
-  GROQ_API_KEY: process.env.GROQ_API_KEY,
+  GROQ_API_KEY: process.env.GROQ_API_KEY || "",
   GROQ_MODEL: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
   SERVER_URL: process.env.SERVER_URL || 'http://localhost:5000',
