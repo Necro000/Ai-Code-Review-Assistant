@@ -60,9 +60,10 @@ export default function Sidebar() {
       )}
 
       {/* Navigation Links */}
-      <nav className="flex-1 flex flex-col gap-0.5 px-3 py-3 overflow-y-auto">
+      <nav className="flex-1 flex flex-col gap-1 px-3 py-3 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.path ||
+          const isActive =
+            location.pathname === item.path ||
             (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
           const Icon = item.icon;
 
@@ -71,12 +72,11 @@ export default function Sidebar() {
               key={item.path}
               to={item.path}
               title={collapsed ? item.label : ''}
-              className={`relative group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive ? 'text-white' : 'hover:text-white'
+              className={`relative group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                isActive ? 'text-[var(--color-accent-hover)] font-bold' : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]'
               }`}
               style={{
                 backgroundColor: isActive ? 'var(--color-accent-muted)' : 'transparent',
-                color: isActive ? 'var(--color-accent-hover)' : 'var(--color-text-secondary)',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -101,22 +101,21 @@ export default function Sidebar() {
 
               <Icon
                 className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${
-                  isActive ? 'scale-110' : 'group-hover:scale-105'
+                  isActive ? 'scale-110 text-[var(--color-accent)]' : 'group-hover:scale-105'
                 }`}
               />
 
               {!collapsed && (
-                <span className="truncate animate-fade-in">{item.label}</span>
+                <span className="truncate">{item.label}</span>
               )}
 
               {/* Tooltip when collapsed */}
               {collapsed && (
                 <div
-                  className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50"
+                  className="pointer-events-none absolute left-full ml-3 px-2.5 py-1.5 rounded-xl text-xs font-bold text-[var(--color-text)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-xl"
                   style={{
-                    backgroundColor: 'var(--color-surface-active)',
-                    border: '1px solid var(--color-border-hover)',
-                    boxShadow: 'var(--shadow-lg)',
+                    backgroundColor: 'var(--color-bg-secondary)',
+                    border: '1px solid var(--color-border)',
                   }}
                 >
                   {item.label}
@@ -134,18 +133,18 @@ export default function Sidebar() {
       >
         {!collapsed && (
           <div
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 transition-colors"
-            style={{ backgroundColor: 'var(--color-surface)' }}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 transition-colors border"
+            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
             <div
-              className="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white flex-shrink-0"
-              style={{ background: 'var(--gradient-brand)' }}
+              className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-black text-white flex-shrink-0"
+              style={{ background: 'var(--gradient-brand)', boxShadow: 'var(--shadow-glow)' }}
             >
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{displayName}</p>
-              <p className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>{roleLabel}</p>
+              <p className="text-xs font-bold text-[var(--color-text)] truncate">{displayName}</p>
+              <p className="text-[10px] font-semibold text-[var(--color-text-muted)]">{roleLabel}</p>
             </div>
           </div>
         )}
@@ -156,6 +155,7 @@ export default function Sidebar() {
           className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer"
           style={{ color: 'var(--color-text-muted)' }}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
             e.currentTarget.style.color = 'var(--color-text-secondary)';
@@ -170,7 +170,7 @@ export default function Sidebar() {
               collapsed ? 'rotate-180' : ''
             }`}
           />
-          {!collapsed && <span className="text-xs">Collapse</span>}
+          {!collapsed && <span className="text-xs font-semibold">Collapse</span>}
         </button>
       </div>
     </aside>
