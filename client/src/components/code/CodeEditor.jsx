@@ -4,10 +4,8 @@ export default function CodeEditor({ value, onChange, placeholder = 'Paste or ty
   const textareaRef = useRef(null);
   const lineNumbersRef = useRef(null);
 
-  // Split value by newlines to get line count
   const lines = value.split('\n');
 
-  // Synchronize scroll between textarea and line numbers sidebar
   const handleScroll = () => {
     if (textareaRef.current && lineNumbersRef.current) {
       lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
@@ -15,34 +13,30 @@ export default function CodeEditor({ value, onChange, placeholder = 'Paste or ty
   };
 
   useEffect(() => {
-    // Keep scroll in sync on mount / updates
     handleScroll();
   }, [value]);
 
   return (
     <div
-      className="flex border rounded-xl overflow-hidden font-mono text-sm leading-relaxed relative focus-within:ring-2"
+      className="flex border rounded-xl overflow-hidden font-mono text-sm leading-relaxed relative"
       style={{
         backgroundColor: 'var(--color-bg-secondary)',
         borderColor: 'var(--color-border)',
         height: '400px',
-        focusWithin: {
-          borderColor: 'var(--color-accent)',
-        },
       }}
     >
       {/* Line Numbers Sidebar */}
       <div
         ref={lineNumbersRef}
-        className="select-none py-4 text-right pr-3 pl-4 border-r flex flex-col overflow-hidden w-12"
+        className="select-none py-4 text-right pr-3 pl-4 border-r flex flex-col overflow-hidden w-12 flex-shrink-0"
         style={{
-          backgroundColor: 'rgba(10, 14, 26, 0.3)',
+          backgroundColor: 'var(--color-bg-tertiary)',
           borderColor: 'var(--color-border)',
           color: 'var(--color-text-muted)',
         }}
       >
         {lines.map((_, i) => (
-          <div key={i} className="h-6">
+          <div key={i} className="h-6 leading-6 text-xs font-semibold">
             {i + 1}
           </div>
         ))}
