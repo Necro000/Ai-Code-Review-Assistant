@@ -23,7 +23,7 @@ export default function LanguageBarChart({ breakdown = [] }) {
   if (data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[280px] rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 glass">
-        <p className="text-sm font-bold text-white">No language metrics yet</p>
+        <p className="text-sm font-bold text-[var(--color-text)]">No language metrics yet</p>
         <p className="text-xs text-[var(--color-text-muted)] mt-1 text-center max-w-xs">
           Submit code in JS, Python, TS, Java, or C++ to generate multi-language distribution data.
         </p>
@@ -32,10 +32,10 @@ export default function LanguageBarChart({ breakdown = [] }) {
   }
 
   return (
-    <div className="rounded-2xl border p-6 glass border-[var(--color-border)] shadow-md space-y-4">
+    <div className="rounded-2xl border p-6 glass border-[var(--color-border)] shadow-sm space-y-4 bg-[var(--color-surface)]">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">Language Distribution</h3>
+          <h3 className="text-sm font-extrabold text-[var(--color-text)] uppercase tracking-wider">Language Distribution</h3>
           <p className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
             Total code reviews grouped by programming language
           </p>
@@ -54,7 +54,7 @@ export default function LanguageBarChart({ breakdown = [] }) {
             ))}
           </defs>
 
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" opacity={0.3} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" opacity={0.4} />
           <XAxis
             dataKey="name"
             tick={{ fill: 'var(--color-text-muted)', fontSize: 10, fontWeight: 600 }}
@@ -70,12 +70,12 @@ export default function LanguageBarChart({ breakdown = [] }) {
               if (active && payload && payload.length) {
                 const item = payload[0].payload;
                 return (
-                  <div className="p-3 rounded-xl border glass shadow-2xl space-y-1 bg-[var(--color-bg-secondary)] border-[var(--color-border)]">
-                    <p className="text-xs font-bold text-white flex items-center gap-2">
+                  <div className="p-3 rounded-xl border shadow-xl space-y-1 bg-[var(--color-bg-secondary)] border-[var(--color-border)]">
+                    <p className="text-xs font-bold text-[var(--color-text)] flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: item.color1 }} />
                       {item.name}
                     </p>
-                    <p className="text-sm font-extrabold text-white">
+                    <p className="text-sm font-extrabold text-[var(--color-text)]">
                       {item.count} review{item.count !== 1 ? 's' : ''} ({item.percentage}%)
                     </p>
                   </div>
@@ -93,18 +93,18 @@ export default function LanguageBarChart({ breakdown = [] }) {
       </ResponsiveContainer>
 
       {/* Language Breakdown Pills */}
-      <div className="flex flex-wrap gap-2 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+      <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--color-border)]">
         {data.map((lang) => (
           <div
             key={lang.name}
             className="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs border"
             style={{
-              backgroundColor: 'var(--color-surface)',
+              backgroundColor: 'var(--color-bg-secondary)',
               borderColor: 'var(--color-border)',
             }}
           >
             <span className="w-2 h-2 rounded-full" style={{ background: lang.color1 }} />
-            <span className="font-bold text-white">{lang.name}</span>
+            <span className="font-bold text-[var(--color-text)]">{lang.name}</span>
             <span className="text-[10px] font-semibold text-[var(--color-text-muted)]">
               {lang.percentage}%
             </span>

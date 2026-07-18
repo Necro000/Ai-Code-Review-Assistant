@@ -3,7 +3,6 @@ import {
   HiOutlineShieldCheck,
   HiOutlineExclamationTriangle,
   HiOutlineChartBar,
-  HiOutlineCheckCircle,
 } from 'react-icons/hi2';
 import ScoreBadge from '../review/ScoreBadge';
 
@@ -29,10 +28,10 @@ export default function StatsCards({ stats }) {
       value: totalReviews,
       subtext: `${totalReviews} total snippet & file scans`,
       icon: HiOutlineDocumentMagnifyingGlass,
-      gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.05) 100%)',
+      gradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.04) 100%)',
       borderColor: 'rgba(99, 102, 241, 0.25)',
       iconBg: 'rgba(99, 102, 241, 0.15)',
-      iconColor: '#818cf8',
+      iconColor: '#6366f1',
     },
     {
       label: 'Average Score',
@@ -40,10 +39,10 @@ export default function StatsCards({ stats }) {
       subtext: rating.label,
       ratingPill: rating,
       icon: HiOutlineChartBar,
-      gradient: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)',
+      gradient: 'linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.04) 100%)',
       borderColor: 'rgba(34, 197, 94, 0.25)',
       iconBg: 'rgba(34, 197, 94, 0.15)',
-      iconColor: '#4ade80',
+      iconColor: '#22c55e',
       isScore: true,
     },
     {
@@ -51,20 +50,20 @@ export default function StatsCards({ stats }) {
       value: totalIssues,
       subtext: totalReviews ? `Avg ${(totalIssues / Math.max(1, totalReviews)).toFixed(1)} per review` : '0 per review',
       icon: HiOutlineExclamationTriangle,
-      gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 100%)',
+      gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.04) 100%)',
       borderColor: 'rgba(245, 158, 11, 0.25)',
       iconBg: 'rgba(245, 158, 11, 0.15)',
-      iconColor: '#fbbf24',
+      iconColor: '#f59e0b',
     },
     {
       label: 'Clean Passes',
       value: cleanPasses,
       subtext: totalReviews ? `${Math.round((cleanPasses / Math.max(1, totalReviews)) * 100)}% pass rate` : '0% pass rate',
       icon: HiOutlineShieldCheck,
-      gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.05) 100%)',
+      gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.04) 100%)',
       borderColor: 'rgba(59, 130, 246, 0.25)',
       iconBg: 'rgba(59, 130, 246, 0.15)',
-      iconColor: '#60a5fa',
+      iconColor: '#3b82f6',
     },
   ];
 
@@ -82,7 +81,6 @@ export default function StatsCards({ stats }) {
               animationDelay: `${index * 80}ms`,
             }}
           >
-            {/* Background subtle glow effect */}
             <div
               className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full pointer-events-none opacity-20 transition-opacity duration-300 group-hover:opacity-40"
               style={{ background: card.iconColor, filter: 'blur(20px)' }}
@@ -94,7 +92,7 @@ export default function StatsCards({ stats }) {
                   {card.label}
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-white tracking-tight">
+                  <span className="text-3xl font-extrabold text-[var(--color-text)] tracking-tight">
                     {card.value}
                   </span>
                 </div>
@@ -117,8 +115,7 @@ export default function StatsCards({ stats }) {
               )}
             </div>
 
-            {/* Subtext / rating pill */}
-            <div className="mt-4 pt-3 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-between text-xs relative z-10">
+            <div className="mt-4 pt-3 border-t border-[var(--color-border)] flex items-center justify-between text-xs relative z-10">
               <span className="text-[11px] font-medium text-[var(--color-text-secondary)]">
                 {card.subtext}
               </span>
