@@ -188,7 +188,7 @@ export default function LoginPage() {
           </div>
 
           <a
-            href="/api/auth/github"
+            href={`${import.meta.env.VITE_API_URL || ''}/api/auth/github`}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-200 cursor-pointer shadow-sm"
           >
             <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
