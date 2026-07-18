@@ -50,7 +50,7 @@ export default function PRReviewPage() {
       {/* Header */}
       <div className="flex items-center justify-between border-b pb-4 border-[var(--color-border)]">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-[var(--color-text)] flex items-center gap-2">
             <HiOutlineCodeBracketSquare className="text-[var(--color-accent)]" />
             GitHub PR Review
           </h2>
@@ -63,7 +63,7 @@ export default function PRReviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Form panel */}
         <div className="lg:col-span-1 rounded-2xl border p-6 bg-[var(--color-surface)] border-[var(--color-border)] space-y-4">
-          <h3 className="text-sm font-bold text-white">Review Request Settings</h3>
+          <h3 className="text-sm font-bold text-[var(--color-text)]">Review Request Settings</h3>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Project Select */}
@@ -189,7 +189,7 @@ export default function PRReviewPage() {
 
           {results && (
             <div className="rounded-2xl border p-6 bg-[var(--color-surface)] border-[var(--color-border)] space-y-4 animate-fade-in">
-              <div className="flex items-center gap-2 text-sm font-bold text-white border-b pb-4 border-[var(--color-border)]">
+              <div className="flex items-center gap-2 text-sm font-bold text-[var(--color-text)] border-b pb-4 border-[var(--color-border)]">
                 <HiOutlineDocumentCheck className="w-5 h-5 text-emerald-500" />
                 PR Review Completed — {results.filesReviewed} file(s) analyzed
               </div>
@@ -201,7 +201,7 @@ export default function PRReviewPage() {
                     className="flex items-center justify-between p-4 rounded-xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all"
                   >
                     <div className="space-y-1">
-                      <p className="text-xs font-bold text-white truncate max-w-md">
+                      <p className="text-xs font-bold text-[var(--color-text)] truncate max-w-md">
                         {rev.fileName}
                       </p>
                       <div className="flex items-center gap-2 text-[10px] text-[var(--color-text-muted)]">

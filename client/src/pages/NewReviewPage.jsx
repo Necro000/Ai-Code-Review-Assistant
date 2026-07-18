@@ -170,7 +170,7 @@ export default function NewReviewPage() {
     <div className="animate-fade-in space-y-6 max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">New Review</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text)]">New Review</h1>
         <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
           Submit code snippets or source files to analyze them using AI and Static Checkers.
         </p>
@@ -271,7 +271,7 @@ export default function NewReviewPage() {
                   type="button"
                   onClick={() => setShowProjectDropdown((prev) => !prev)}
                   disabled={isLoadingProjects}
-                  className="w-full flex items-center justify-between px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-accent)] cursor-pointer text-left text-white transition-all duration-200"
+                  className="w-full flex items-center justify-between px-3 py-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-accent)] cursor-pointer text-left text-[var(--color-text)] transition-all duration-200"
                 >
                   <span className="truncate">
                     {selectedProjectId
@@ -287,7 +287,7 @@ export default function NewReviewPage() {
                     style={{
                       top: '105%',
                       borderColor: 'var(--color-border)',
-                      backgroundColor: 'rgba(15, 23, 42, 0.98)',
+                      backgroundColor: 'var(--color-bg-secondary)',
                     }}
                   >
                     <button
@@ -362,11 +362,11 @@ export default function NewReviewPage() {
             <div className="text-xs text-[var(--color-text-muted)] space-y-1">
               <div className="flex justify-between">
                 <span>Analysis mode</span>
-                <span className="font-semibold text-white">Full Review</span>
+                <span className="font-semibold text-[var(--color-text)]">Full Review</span>
               </div>
               <div className="flex justify-between">
                 <span>Review credits</span>
-                <span className="font-semibold text-white">Unlimited</span>
+                <span className="font-semibold text-[var(--color-text)]">Unlimited</span>
               </div>
             </div>
 

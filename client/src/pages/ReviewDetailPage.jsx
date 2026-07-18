@@ -73,10 +73,10 @@ export default function ReviewDetailPage() {
   if (error || !reviewData) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-        <p className="text-lg font-bold text-white">Review report not found.</p>
+        <p className="text-lg font-bold text-[var(--color-text)]">Review report not found.</p>
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] rounded-xl text-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] rounded-xl text-sm font-semibold text-[var(--color-text)]"
         >
           <HiOutlineArrowLeft className="w-4 h-4" />
           Go Back
@@ -96,7 +96,7 @@ export default function ReviewDetailPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-[var(--color-text)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-200 cursor-pointer"
           >
             <HiOutlineArrowLeft className="w-4 h-4" />
             Back

@@ -72,7 +72,7 @@ export default function UserTable({ users = [], onUpdateRole, onDeleteUser, curr
                           {initials}
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-white flex items-center gap-1.5 leading-none">
+                          <p className="text-xs font-bold text-[var(--color-text)] flex items-center gap-1.5 leading-none">
                             {user.name}
                             {isSelf && (
                               <span className="text-[9px] px-1.5 py-0.2 bg-[var(--color-accent-muted)] text-[var(--color-accent)] border border-[var(--color-accent)]/20 font-bold uppercase rounded">

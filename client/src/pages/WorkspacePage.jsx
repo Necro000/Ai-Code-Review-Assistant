@@ -42,7 +42,7 @@ export default function WorkspacePage() {
       {/* Page Header */}
       <div className="flex items-center justify-between border-b pb-5" style={{ borderColor: 'var(--color-border)' }}>
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2.5">
+          <h1 className="text-2xl font-extrabold text-[var(--color-text)] flex items-center gap-2.5">
             <span
               className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
               style={{ background: 'var(--gradient-brand)', boxShadow: 'var(--shadow-glow)' }}
@@ -162,7 +162,7 @@ export default function WorkspacePage() {
             <HiOutlineUserGroup className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">No workspaces yet</h3>
+            <h3 className="text-lg font-bold text-[var(--color-text)]">No workspaces yet</h3>
             <p className="text-xs mt-1 max-w-xs mx-auto" style={{ color: 'var(--color-text-muted)' }}>
               Create a workspace to invite your team and collaborate on code reviews in real-time.
             </p>
@@ -194,7 +194,7 @@ export default function WorkspacePage() {
       {!isLoading && workspaces.length > 0 && (
         <>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold text-white uppercase tracking-wider">
+            <span className="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">
               Your Workspaces
             </span>
             <span className="badge badge-accent">{workspaces.length}</span>

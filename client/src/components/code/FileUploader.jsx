@@ -113,7 +113,7 @@ export default function FileUploader({ files, onChange }) {
             style={{ color: 'var(--color-accent)' }}
           />
         </div>
-        <p className="text-sm font-semibold text-white">
+        <p className="text-sm font-semibold text-[var(--color-text)]">
           Drag & drop files here or <span style={{ color: 'var(--color-accent-hover)' }}>browse</span>
         </p>
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">
@@ -141,7 +141,7 @@ export default function FileUploader({ files, onChange }) {
               <div className="flex items-center gap-3">
                 <HiOutlineDocumentText className="w-5 h-5" style={{ color: 'var(--color-accent)' }} />
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-white max-w-[200px] sm:max-w-xs truncate">
+                  <span className="text-sm font-medium text-[var(--color-text)] max-w-[200px] sm:max-w-xs truncate">
                     {file.name}
                   </span>
                   <span className="text-xs text-[var(--color-text-muted)]">

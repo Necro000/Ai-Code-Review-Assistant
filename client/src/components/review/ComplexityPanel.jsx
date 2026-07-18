@@ -8,7 +8,6 @@ import {
 export default function ComplexityPanel({ code = '', language = '' }) {
   const lang = language ? language.toLowerCase() : 'unknown';
 
-  // --- Inline calculation logic (matches backend rules for self-containment) ---
   const isComment = (line) => {
     const trimmed = line.trim();
     if (trimmed.length === 0) return false;
@@ -75,9 +74,9 @@ export default function ComplexityPanel({ code = '', language = '' }) {
 
   return (
     <div
-      className="rounded-2xl border p-5 bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-300 w-full space-y-4"
+      className="rounded-2xl border p-5 bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-300 w-full space-y-4 shadow-sm"
     >
-      <h3 className="text-sm font-semibold text-white">Complexity Metrics</h3>
+      <h3 className="text-sm font-bold text-[var(--color-text)]">Complexity Metrics</h3>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {metrics.map((m) => {
@@ -89,7 +88,7 @@ export default function ComplexityPanel({ code = '', language = '' }) {
             >
               <div
                 className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0"
-                style={{ backgroundColor: 'rgba(99, 102, 241, 0.06)' }}
+                style={{ backgroundColor: 'var(--color-accent-muted)' }}
               >
                 <Icon className="w-4 h-4" style={{ color: m.color }} />
               </div>
@@ -97,7 +96,7 @@ export default function ComplexityPanel({ code = '', language = '' }) {
                 <span className="text-[10px] font-semibold text-[var(--color-text-muted)] tracking-wide uppercase">
                   {m.label.split(' ')[0]}
                 </span>
-                <span className="text-base font-bold text-white leading-tight mt-0.5">
+                <span className="text-base font-bold text-[var(--color-text)] leading-tight mt-0.5">
                   {m.value}
                 </span>
               </div>
@@ -109,9 +108,9 @@ export default function ComplexityPanel({ code = '', language = '' }) {
       <div className="pt-2 flex items-center justify-between text-xs border-t border-[var(--color-border)]">
         <span className="text-[var(--color-text-muted)]">
           Average complexity per function:{' '}
-          <strong className="text-white">{avgCC}</strong>
+          <strong className="text-[var(--color-text)]">{avgCC}</strong>
         </span>
-        <span className="font-semibold" style={{ color: rating.color }}>
+        <span className="font-bold" style={{ color: rating.color }}>
           Rating: {rating.text}
         </span>
       </div>

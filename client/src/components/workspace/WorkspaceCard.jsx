@@ -13,7 +13,7 @@ export default function WorkspaceCard({ workspace }) {
       <div className="space-y-4">
         {/* Workspace Name & Role */}
         <div className="flex items-start justify-between">
-          <h3 className="text-lg font-bold text-white leading-tight">
+          <h3 className="text-lg font-bold text-[var(--color-text)] leading-tight">
             {workspace.name}
           </h3>
           <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider bg-[var(--color-accent-muted)] text-[var(--color-accent)] border border-[var(--color-accent)]/20">
@@ -24,22 +24,22 @@ export default function WorkspaceCard({ workspace }) {
         {/* Stats Row */}
         <div className="grid grid-cols-2 gap-4 pt-2">
           <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-surface-hover)]">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-bg-secondary)]">
               <HiOutlineUserGroup className="w-4 h-4 text-[var(--color-accent)]" />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Members</p>
-              <p className="font-bold text-white mt-0.5">{memberCount}</p>
+              <p className="font-bold text-[var(--color-text)] mt-0.5">{memberCount}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-surface-hover)]">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-bg-secondary)]">
               <HiOutlineFolder className="w-4 h-4 text-emerald-500" />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Projects</p>
-              <p className="font-bold text-white mt-0.5">{projectCount}</p>
+              <p className="font-bold text-[var(--color-text)] mt-0.5">{projectCount}</p>
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function WorkspaceCard({ workspace }) {
             <HiOutlineCalendar className="w-3.5 h-3.5" />
             Created {new Date(workspace.createdAt).toLocaleDateString()}
           </span>
-          <span className="font-medium text-[var(--color-accent-hover)] hover:underline">
+          <span className="font-semibold text-[var(--color-accent-hover)] hover:underline">
             View Details &rarr;
           </span>
         </div>
