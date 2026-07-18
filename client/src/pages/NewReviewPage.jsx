@@ -92,9 +92,14 @@ export default function NewReviewPage() {
     },
     onSuccess: (response) => {
       toast.success('Code review completed successfully!');
-      // Invalidate queries so dashboard reflects the new review
       queryClient.invalidateQueries(['reviews']);
-      navigate('/dashboard');
+      queryClient.invalidateQueries(['dashboardStats']);
+      const reviewId = response?.data?.review?.id || response?.data?.id;
+      if (reviewId) {
+        navigate(`/review/${reviewId}`);
+      } else {
+        navigate('/history');
+      }
     },
     onError: (error) => {
       const errorMsg = error.response?.data?.error?.message || 'Failed to complete code review.';
@@ -115,7 +120,13 @@ export default function NewReviewPage() {
     onSuccess: (response) => {
       toast.success('Files code review completed successfully!');
       queryClient.invalidateQueries(['reviews']);
-      navigate('/dashboard');
+      queryClient.invalidateQueries(['dashboardStats']);
+      const reviewId = response?.data?.reviews?.[0]?.reviewId || response?.data?.review?.id;
+      if (reviewId) {
+        navigate(`/review/${reviewId}`);
+      } else {
+        navigate('/history');
+      }
     },
     onError: (error) => {
       const errorMsg = error.response?.data?.error?.message || 'Failed to complete code review.';

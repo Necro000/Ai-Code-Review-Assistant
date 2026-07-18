@@ -75,11 +75,11 @@ export default function ReviewDetailPage() {
       <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
         <p className="text-lg font-bold text-white">Review report not found.</p>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] rounded-xl text-sm"
         >
           <HiOutlineArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          Go Back
         </button>
       </div>
     );
@@ -95,11 +95,11 @@ export default function ReviewDetailPage() {
       <div className="flex items-center justify-between border-b pb-4 border-[var(--color-border)]">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] hover:border-[var(--color-border-hover)] transition-all duration-200 cursor-pointer"
           >
             <HiOutlineArrowLeft className="w-4 h-4" />
-            Back to Dashboard
+            Back
           </button>
           <CollaboratorsBar users={collaborators} />
         </div>

@@ -63,7 +63,12 @@ export default function HistoryPage() {
   };
 
   const reviews = historyData?.data?.reviews || [];
-  const meta = historyData?.meta || { page: 1, totalPages: 1, total: 0 };
+  const rawMeta = historyData?.data?.meta || historyData?.meta || {};
+  const meta = {
+    page: rawMeta.page || page,
+    totalPages: rawMeta.totalPages || 1,
+    total: rawMeta.total || 0,
+  };
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -104,12 +109,18 @@ export default function HistoryPage() {
                 setSeverity(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 pr-8 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-xs focus:outline-none focus:border-[var(--color-accent)] cursor-pointer text-white"
+              className="w-full px-3 py-2 pr-8 border rounded-xl text-xs focus:outline-none cursor-pointer appearance-none"
+              style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: severity ? 'var(--color-accent)' : 'var(--color-border)',
+                color: 'var(--color-text)',
+                boxShadow: severity ? '0 0 0 2px var(--color-accent-muted)' : 'none',
+              }}
             >
               <option value="">All Severities</option>
-              <option value="error">Errors</option>
-              <option value="warning">Warnings</option>
-              <option value="info">Info</option>
+              <option value="error">🔴 Errors</option>
+              <option value="warning">🟡 Warnings</option>
+              <option value="info">🔵 Info</option>
             </select>
           </div>
 
@@ -121,14 +132,35 @@ export default function HistoryPage() {
                 setReviewType(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 pr-8 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-xs focus:outline-none focus:border-[var(--color-accent)] cursor-pointer text-white"
+              className="w-full px-3 py-2 pr-8 border rounded-xl text-xs focus:outline-none cursor-pointer appearance-none"
+              style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: reviewType ? 'var(--color-accent)' : 'var(--color-border)',
+                color: 'var(--color-text)',
+                boxShadow: reviewType ? '0 0 0 2px var(--color-accent-muted)' : 'none',
+              }}
             >
               <option value="">All Review Types</option>
-              <option value="combined">Combined</option>
-              <option value="static_only">Static Only</option>
-              <option value="ai_only">AI Only</option>
+              <option value="combined">⚡ Combined</option>
+              <option value="static_only">🔧 Static Only</option>
+              <option value="ai_only">✨ AI Only</option>
             </select>
           </div>
+
+          {/* Clear filters */}
+          {(severity || reviewType || q) && (
+            <button
+              onClick={() => { setSeverity(''); setReviewType(''); setQ(''); setPage(1); }}
+              className="px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+              style={{
+                backgroundColor: 'var(--color-error-muted)',
+                color: 'var(--color-error)',
+                border: '1px solid rgba(239,68,68,0.2)',
+              }}
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
 
