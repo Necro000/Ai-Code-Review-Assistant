@@ -22,7 +22,7 @@ function sendSuccess(res, { data = null, message = 'Success', statusCode = 200, 
     message,
   };
 
-  if (meta) response.meta = meta;
+  if (meta) {response.meta = meta;}
 
   return res.status(statusCode).json(response);
 }
@@ -46,7 +46,7 @@ function sendError(res, { message = 'Internal Server Error', statusCode = 500, e
     },
   };
 
-  if (details) response.error.details = details;
+  if (details) {response.error.details = details;}
 
   return res.status(statusCode).json(response);
 }

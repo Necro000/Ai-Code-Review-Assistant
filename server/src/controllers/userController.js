@@ -39,7 +39,7 @@ const updateProfile = async (req, res, next) => {
     const { name, email } = req.body;
     const updateData = {};
 
-    if (name) updateData.name = name.trim();
+    if (name) {updateData.name = name.trim();}
 
     if (email) {
       const normalizedEmail = email.toLowerCase().trim();

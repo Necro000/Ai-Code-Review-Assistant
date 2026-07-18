@@ -26,10 +26,10 @@ if (!existsSync(tempDir)) {
  */
 const normalizeESLintResults = (results) => {
   const findings = [];
-  if (!Array.isArray(results) || results.length === 0) return findings;
+  if (!Array.isArray(results) || results.length === 0) {return findings;}
 
   const fileResult = results[0];
-  if (!fileResult.messages) return findings;
+  if (!fileResult.messages) {return findings;}
 
   fileResult.messages.forEach((msg) => {
     findings.push({
@@ -52,7 +52,7 @@ const normalizeESLintResults = (results) => {
  */
 const normalizePylintResults = (results) => {
   const findings = [];
-  if (!Array.isArray(results)) return findings;
+  if (!Array.isArray(results)) {return findings;}
 
   results.forEach((msg) => {
     // Pylint type mapping:
@@ -190,7 +190,7 @@ const runPylint = async (code) => {
  */
 const normalizeCheckstyleResults = (xmlString) => {
   const findings = [];
-  if (!xmlString) return findings;
+  if (!xmlString) {return findings;}
 
   const errorRegex = /<error\s+line="(\d+)"\s*(?:column="(\d+)"\s*)?severity="([^"]+)"\s+message="([^"]+)"\s+source="([^"]+)"/g;
   let match;
@@ -223,7 +223,7 @@ const normalizeCheckstyleResults = (xmlString) => {
  */
 const normalizeCppcheckResults = (xmlString) => {
   const findings = [];
-  if (!xmlString) return findings;
+  if (!xmlString) {return findings;}
 
   const errorBlockRegex = /<error\s+id="([^"]+)"\s+severity="([^"]+)"\s+msg="([^"]+)"[^>]*>([\s\S]*?)<\/error>/g;
   let match;
@@ -358,7 +358,7 @@ const runCppcheck = async (code) => {
  * Main Static Analysis Router — dispatches to the correct linter by language.
  */
 const analyzeCode = async (code, language) => {
-  if (!code || !language) return [];
+  if (!code || !language) {return [];}
 
   const lang = language.toLowerCase();
 

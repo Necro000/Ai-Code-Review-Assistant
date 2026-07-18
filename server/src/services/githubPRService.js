@@ -15,7 +15,7 @@ const fetchPRFiles = async (owner, repo, pullNumber) => {
   const results = [];
   for (const file of files) {
     // Only analyze added, modified, or renamed files containing active code patches
-    if (file.status === 'removed' || !file.patch) continue;
+    if (file.status === 'removed' || !file.patch) {continue;}
 
     let code = '';
     try {

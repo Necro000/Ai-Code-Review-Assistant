@@ -99,7 +99,7 @@ const throttleMinuteLimits = async (estimatedTokens) => {
  * Sanitizes AI response text to strip markdown code blocks if present
  */
 const cleanJSONResponse = (text) => {
-  if (!text) return '';
+  if (!text) {return '';}
   let cleaned = text.trim();
   
   // Remove starting ```json and ending ```

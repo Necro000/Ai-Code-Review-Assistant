@@ -1,5 +1,4 @@
 const fs = require('fs').promises;
-const path = require('path');
 const { detectLanguage } = require('../utils/languageDetector');
 const AppError = require('../utils/AppError');
 
@@ -54,7 +53,7 @@ const processUploads = async (files, projectId) => {
       });
     } catch (error) {
       // Propagate operational errors
-      if (error instanceof AppError) throw error;
+      if (error instanceof AppError) {throw error;}
       throw new AppError(`Failed to read file ${file.originalname}`, 500, 'FILE_READ_ERROR');
     } finally {
       // Clean up temp file

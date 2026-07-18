@@ -30,7 +30,7 @@ const EXTENSION_MAP = {
  * @returns {string} detected language or 'unknown'
  */
 const sniffContent = (content) => {
-  if (!content || typeof content !== 'string') return 'unknown';
+  if (!content || typeof content !== 'string') {return 'unknown';}
 
   const trimmed = content.trim();
 

@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 let transporter;
 
 const getTransporter = () => {
-  if (!process.env.SMTP_HOST) return null; // Email disabled — skip silently
+  if (!process.env.SMTP_HOST) {return null;} // Email disabled — skip silently
 
   if (!transporter) {
     transporter = nodemailer.createTransport({
@@ -21,7 +21,7 @@ const getTransporter = () => {
 
 const sendReviewCompleteEmail = async (toEmail, review) => {
   const transport = getTransporter();
-  if (!transport || !toEmail) return; // Not configured or no target email — skip silently
+  if (!transport || !toEmail) {return;} // Not configured or no target email — skip silently
 
   const errorCount = review.findings?.filter(f => f.severity === 'error').length || 0;
   const warningCount = review.findings?.filter(f => f.severity === 'warning').length || 0;

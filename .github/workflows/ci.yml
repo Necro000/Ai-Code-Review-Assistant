@@ -44,4 +44,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: server/package-lock.json
       - run: cd server && npm ci
-      - run: cd server && npx prisma validate
+      - name: Validate Prisma Schema
+        run: cd server && npx prisma validate
+        env:
+          DATABASE_URL: "postgresql://user:password@localhost:5432/dummy"

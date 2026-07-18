@@ -2,7 +2,6 @@ const { prisma } = require('../config/db');
 const staticAnalysis = require('./staticAnalysisService');
 const aiReview = require('./aiReviewService');
 const complexityAnalysis = require('./complexityService');
-const AppError = require('../utils/AppError');
 const scoringService = require('./scoringService');
 
 /**
