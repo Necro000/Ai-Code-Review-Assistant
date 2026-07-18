@@ -3,6 +3,12 @@ import ScoreBadge from './ScoreBadge';
 export default function ReviewHeader({ review }) {
   const score = review.overallScore;
 
+  // Clean markdown asterisks for display
+  const formatSummary = (text) => {
+    if (!text) return 'No review summary was generated.';
+    return text.replace(/\*\*(.*?)\*\*/g, '$1');
+  };
+
   return (
     <div
       className="rounded-2xl border p-6 glass flex flex-col md:flex-row gap-6 items-center justify-between"
@@ -42,14 +48,14 @@ export default function ReviewHeader({ review }) {
 
       {/* Summary Explanation */}
       <div
-        className="flex-1 md:max-w-md p-4 rounded-xl border bg-[var(--color-bg-secondary)] text-sm leading-relaxed"
+        className="flex-1 md:max-w-md p-4 rounded-2xl border bg-[var(--color-bg-secondary)] text-xs leading-relaxed"
         style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
       >
         <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">
           AI Summary & Insights
         </span>
-        <p className="whitespace-pre-line text-[var(--color-text-secondary)]">
-          {review.summary || 'No review summary was generated.'}
+        <p className="whitespace-pre-line text-[var(--color-text-secondary)] font-medium">
+          {formatSummary(review.summary)}
         </p>
       </div>
     </div>

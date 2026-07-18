@@ -21,8 +21,8 @@ export default function FindingsList({ findings = [], onJump }) {
   return (
     <div className="space-y-4">
       {/* Filters Bar */}
-      <div className="flex flex-wrap gap-4 items-center justify-between border-b pb-4 border-[var(--color-border)]">
-        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+      <div className="flex flex-wrap gap-3 items-center justify-between border-b pb-4 border-[var(--color-border)]">
+        <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
           Analysis Findings ({filtered.length})
         </span>
 
@@ -31,7 +31,7 @@ export default function FindingsList({ findings = [], onJump }) {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="px-2 py-1 bg-[var(--color-bg-secondary)] border rounded-lg text-xs focus:outline-none transition-colors duration-200 cursor-pointer text-white"
+            className="px-3 py-1.5 bg-[var(--color-bg-secondary)] border rounded-xl text-xs font-semibold focus:outline-none transition-colors duration-200 cursor-pointer text-[var(--color-text)]"
             style={{ borderColor: 'var(--color-border)' }}
           >
             <option value="all">All Severities ({findings.length})</option>
@@ -44,7 +44,7 @@ export default function FindingsList({ findings = [], onJump }) {
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="px-2 py-1 bg-[var(--color-bg-secondary)] border rounded-lg text-xs focus:outline-none transition-colors duration-200 cursor-pointer text-white"
+            className="px-3 py-1.5 bg-[var(--color-bg-secondary)] border rounded-xl text-xs font-semibold focus:outline-none transition-colors duration-200 cursor-pointer text-[var(--color-text)]"
             style={{ borderColor: 'var(--color-border)' }}
           >
             <option value="all">All Sources</option>
@@ -56,8 +56,8 @@ export default function FindingsList({ findings = [], onJump }) {
 
       {/* Card Listing */}
       {filtered.length === 0 ? (
-        <div className="text-center p-8 rounded-xl border border-dashed border-[var(--color-border)] bg-[rgba(10,14,26,0.15)]">
-          <p className="text-sm text-[var(--color-text-muted)]">No findings match your active filters.</p>
+        <div className="text-center p-8 rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)]">
+          <p className="text-sm font-semibold text-[var(--color-text-muted)]">No findings match your active filters.</p>
         </div>
       ) : (
         <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
