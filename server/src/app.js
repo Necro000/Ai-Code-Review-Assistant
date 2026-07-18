@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const PgSession = require('connect-pg-simple')(session);
 const passport = require('passport');
 const { errorHandler } = require('./middleware/errorHandler');
 const env = require('./config/env');
@@ -56,8 +57,17 @@ app.use(express.urlencoded({ extended: true }));
 // Parse cookies (for refresh tokens)
 app.use(cookieParser());
 
+// Express Session Store (PostgreSQL-backed via connect-pg-simple)
+const sessionStore = env.DATABASE_URL
+  ? new PgSession({
+      conString: env.DATABASE_URL,
+      createTableIfMissing: true,
+    })
+  : undefined;
+
 // Express Session (required for Passport)
 app.use(session({
+  store: sessionStore,
   secret: env.SESSION_SECRET || 'fallback_session_secret_at_least_32_characters_long',
   resave: false,
   saveUninitialized: false,
