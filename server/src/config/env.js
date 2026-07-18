@@ -15,19 +15,23 @@ const requiredVars = [
   'DATABASE_URL',
   'JWT_SECRET',
   'JWT_REFRESH_SECRET',
-  'GROQ_API_KEY',
-  'GITHUB_CLIENT_ID',
-  'GITHUB_CLIENT_SECRET',
-  'SESSION_SECRET',
 ];
 
 const missing = requiredVars.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {
-  console.error('❌ Missing required environment variables:');
+  console.error('❌ Missing critical environment variables:');
   missing.forEach((key) => console.error(`   - ${key}`));
   console.error('\n   Copy .env.example to .env and fill in the values.\n');
   process.exit(1);
+}
+
+// Warn about optional features missing config
+if (!process.env.GROQ_API_KEY) {
+  console.warn('⚠️ GROQ_API_KEY is not set. AI review features will be unavailable.');
+}
+if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
+  console.warn('⚠️ GitHub OAuth credentials not set. GitHub login will be disabled.');
 }
 
 module.exports = {
