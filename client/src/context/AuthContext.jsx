@@ -49,31 +49,35 @@ export function AuthProvider({ children }) {
       }
 
       const localToken = localStorage.getItem('accessToken');
+      const savedRefreshToken = localStorage.getItem('refreshToken');
+
       if (localToken) {
         setAccessToken(localToken);
         try {
           const response = await getProfileAPI();
           setUser(response.data.user);
         } catch (err) {
-          // Access token might have expired. Try to refresh.
-          try {
-            const savedRefreshToken = localStorage.getItem('refreshToken');
-            const { data } = await api.post('/auth/refresh', { refreshToken: savedRefreshToken });
-            localStorage.setItem('accessToken', data.data.accessToken);
-            if (data.data.refreshToken) {
-              localStorage.setItem('refreshToken', data.data.refreshToken);
-            }
-            setAccessToken(data.data.accessToken);
-            const userResponse = await getProfileAPI();
-            setUser(userResponse.data.user);
-          } catch (refreshErr) {
+          // Access token might have expired. Try to refresh if refresh token exists.
+          if (!savedRefreshToken) {
             clearAuth();
+          } else {
+            try {
+              const { data } = await api.post('/auth/refresh', { refreshToken: savedRefreshToken });
+              localStorage.setItem('accessToken', data.data.accessToken);
+              if (data.data.refreshToken) {
+                localStorage.setItem('refreshToken', data.data.refreshToken);
+              }
+              setAccessToken(data.data.accessToken);
+              const userResponse = await getProfileAPI();
+              setUser(userResponse.data.user);
+            } catch (refreshErr) {
+              clearAuth();
+            }
           }
         }
-      } else {
-        // No token in memory, try refreshing via HTTPOnly Cookie / localStorage fallback
+      } else if (savedRefreshToken) {
+        // No access token, but refresh token exists: attempt token refresh
         try {
-          const savedRefreshToken = localStorage.getItem('refreshToken');
           const { data } = await api.post('/auth/refresh', { refreshToken: savedRefreshToken });
           localStorage.setItem('accessToken', data.data.accessToken);
           if (data.data.refreshToken) {
@@ -85,6 +89,9 @@ export function AuthProvider({ children }) {
         } catch (refreshErr) {
           clearAuth();
         }
+      } else {
+        // Unauthenticated visitor
+        clearAuth();
       }
       setIsLoading(false);
     };

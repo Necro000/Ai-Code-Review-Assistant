@@ -115,7 +115,7 @@ const loginUser = async (email, password) => {
  */
 const refreshUserToken = async (refreshToken) => {
   if (!refreshToken) {
-    throw new AppError('Refresh token is required', 400, 'REFRESH_TOKEN_REQUIRED');
+    throw new AppError('Refresh token is required', 401, 'REFRESH_TOKEN_REQUIRED');
   }
 
   try {
