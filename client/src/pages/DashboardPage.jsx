@@ -116,7 +116,7 @@ export default function DashboardPage() {
               {firstName}!
             </span>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">Dashboard</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text)]">Dashboard</h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             Here&apos;s an overview of your code reviews and performance.
           </p>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
           >
             <HiOutlineCodeBracket className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-xl font-bold text-white">No reviews yet</h2>
+          <h2 className="text-xl font-bold text-[var(--color-text)]">No reviews yet</h2>
           <p className="mt-2 text-sm max-w-md mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
             Start your first code review by pasting a snippet or uploading a file. AI analysis completes in seconds.
           </p>
@@ -192,7 +192,7 @@ export default function DashboardPage() {
       {/* Core Capabilities */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-base font-bold text-white">Core Capabilities</h2>
+          <h2 className="text-base font-bold text-[var(--color-text)]">Core Capabilities</h2>
           <span className="badge badge-accent">4 Features</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -217,7 +217,7 @@ export default function DashboardPage() {
                 >
                   <Icon className="w-5 h-5" style={{ color: feature.color }} />
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">{feature.title}</h3>
+                <h3 className="text-sm font-bold text-[var(--color-text)] mb-1">{feature.title}</h3>
                 <p
                   className="text-xs leading-relaxed"
                   style={{ color: 'var(--color-text-secondary)' }}
@@ -235,7 +235,7 @@ export default function DashboardPage() {
         className="rounded-2xl border p-5 glass"
         style={{ borderColor: 'var(--color-border)' }}
       >
-        <h2 className="text-sm font-bold text-white mb-4">Quick Actions</h2>
+        <h2 className="text-sm font-bold text-[var(--color-text)] mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {quickActions.map((action) => {
             const Icon = action.icon;
@@ -263,7 +263,7 @@ export default function DashboardPage() {
                 >
                   <Icon className="w-4 h-4" style={{ color: 'var(--color-accent-hover)' }} />
                 </div>
-                <span className="text-sm font-semibold text-white">{action.label}</span>
+                <span className="text-sm font-semibold text-[var(--color-text)]">{action.label}</span>
                 <HiOutlineArrowRight
                   className="w-4 h-4 ml-auto transition-transform duration-200 group-hover:translate-x-1"
                   style={{ color: 'var(--color-text-muted)' }}
