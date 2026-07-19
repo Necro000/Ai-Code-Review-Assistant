@@ -6,6 +6,11 @@ const AppError = require('../utils/AppError');
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
+ * Regex for full name: letters, spaces, hyphens, and apostrophes (2 to 50 chars)
+ */
+const NAME_REGEX = /^[a-zA-Z\s'-]{2,50}$/;
+
+/**
  * Regex for password complexity:
  * - At least 8 characters long
  * - At least 1 uppercase letter
@@ -21,8 +26,8 @@ const validateRegister = (req, res, next) => {
   const { name, email, password } = req.body;
   const errors = [];
 
-  if (!name || typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 50) {
-    errors.push({ field: 'name', message: 'Name must be between 2 and 50 characters long.' });
+  if (!name || typeof name !== 'string' || !NAME_REGEX.test(name.trim())) {
+    errors.push({ field: 'name', message: 'Full Name must contain 2 to 50 letters (numbers and special characters are not allowed).' });
   }
 
   if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
@@ -124,8 +129,8 @@ const validateUpdateProfile = (req, res, next) => {
   const errors = [];
 
   if (name !== undefined) {
-    if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 50) {
-      errors.push({ field: 'name', message: 'Name must be between 2 and 50 characters long.' });
+    if (typeof name !== 'string' || !NAME_REGEX.test(name.trim())) {
+      errors.push({ field: 'name', message: 'Full Name must contain 2 to 50 letters (numbers and special characters are not allowed).' });
     }
   }
 

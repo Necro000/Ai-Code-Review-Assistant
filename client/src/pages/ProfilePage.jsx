@@ -239,7 +239,13 @@ export default function ProfilePage() {
                     style={inputStyle(!!profileForm.formState.errors.name)}
                     onFocus={(e) => onInputFocus(e, !!profileForm.formState.errors.name)}
                     onBlur={(e) => onInputBlur(e, !!profileForm.formState.errors.name)}
-                    {...profileForm.register('name', { required: 'Name is required' })}
+                    {...profileForm.register('name', {
+                      required: 'Name is required',
+                      pattern: {
+                        value: /^[a-zA-Z\s'-]{2,50}$/,
+                        message: 'Name must contain letters only (numbers & symbols are not allowed)',
+                      },
+                    })}
                   />
                   {profileForm.formState.errors.name && (
                     <p className="text-xs" style={{ color: 'var(--color-error)' }}>

@@ -281,8 +281,10 @@ export default function RegisterPage() {
                     onBlur={(e) => onInputBlur(e, !!errors.name)}
                     {...register('name', {
                       required: 'Name is required',
-                      minLength: { value: 2, message: 'Minimum 2 characters' },
-                      maxLength: { value: 50, message: 'Maximum 50 characters' },
+                      pattern: {
+                        value: /^[a-zA-Z\s'-]{2,50}$/,
+                        message: 'Name must contain letters only (numbers & symbols are not allowed)',
+                      },
                     })}
                   />
                 </div>
