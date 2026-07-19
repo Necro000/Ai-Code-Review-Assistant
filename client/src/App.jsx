@@ -31,13 +31,17 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/review/new" element={<NewReviewPage />} />
+            <Route path="/new-review" element={<Navigate to="/review/new" replace />} />
             <Route path="/review/:id" element={<ReviewDetailPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/workspace" element={<WorkspacePage />} />
+            <Route path="/workspaces" element={<Navigate to="/workspace" replace />} />
             <Route path="/workspace/:id" element={<WorkspaceDetailPage />} />
+            <Route path="/workspaces/:id" element={<WorkspaceDetailPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/pr/review" element={<PRReviewPage />} />
+            <Route path="/pr-review" element={<Navigate to="/pr/review" replace />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             {/* NotFound page within layout context */}
             <Route path="*" element={<NotFoundPage />} />

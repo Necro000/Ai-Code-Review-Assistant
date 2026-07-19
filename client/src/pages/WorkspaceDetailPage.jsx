@@ -77,12 +77,20 @@ export default function WorkspaceDetailPage() {
   }
 
   if (error || !data?.data?.workspace) {
+    const isForbidden = error?.response?.status === 403;
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-        <p className="text-lg font-bold text-[var(--color-text)]">Workspace not found.</p>
+      <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
+        <p className="text-xl font-bold text-[var(--color-text)]">
+          {isForbidden ? 'Access Denied: You are not a member of this workspace.' : 'Workspace not found.'}
+        </p>
+        <p className="text-xs text-[var(--color-text-muted)] max-w-md">
+          {isForbidden
+            ? 'You must be invited by the workspace owner to view shared projects and team reviews.'
+            : 'The workspace you are looking for does not exist or may have been deleted.'}
+        </p>
         <button
           onClick={() => navigate('/workspace')}
-          className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border)] rounded-xl text-sm font-semibold text-[var(--color-text)]"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
         >
           <HiOutlineArrowLeft className="w-4 h-4" />
           Back to Workspaces

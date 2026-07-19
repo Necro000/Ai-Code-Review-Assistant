@@ -13,13 +13,18 @@ const assertOwner = async (workspaceId, userId) => {
 };
 
 const assertMember = async (workspaceId, userId) => {
-  const member = await prisma.workspaceMember.findFirst({
-    where: { workspaceId, userId }
-  });
   const ws = await prisma.workspace.findUnique({
     where: { id: workspaceId }
   });
-  if (!member && ws?.ownerId !== userId) {
+  if (!ws) {
+    throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+  }
+
+  const member = await prisma.workspaceMember.findFirst({
+    where: { workspaceId, userId }
+  });
+
+  if (!member && ws.ownerId !== userId) {
     throw new AppError('Forbidden: You are not a member of this workspace', 403, 'FORBIDDEN');
   }
 };
