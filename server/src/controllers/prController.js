@@ -4,16 +4,42 @@ const { sendSuccess } = require('../utils/responseFormatter');
 const AppError = require('../utils/AppError');
 const { prisma } = require('../config/db');
 
+/**
+ * Extracts owner, repo, and pullNumber from a full GitHub PR URL if provided.
+ */
+const parsePRUrl = (urlStr) => {
+  if (!urlStr || typeof urlStr !== 'string') {return null;}
+  const match = urlStr.trim().match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i);
+  if (match) {
+    return {
+      owner: match[1],
+      repo: match[2],
+      pullNumber: parseInt(match[3], 10),
+    };
+  }
+  return null;
+};
+
 const reviewPR = async (req, res, next) => {
   try {
-    const { owner, repo, pullNumber, projectId } = req.body;
+    let { owner, repo, pullNumber, prUrl, projectId } = req.body;
+
+    if (prUrl) {
+      const parsed = parsePRUrl(prUrl);
+      if (parsed) {
+        owner = parsed.owner;
+        repo = parsed.repo;
+        pullNumber = parsed.pullNumber;
+      }
+    }
+
     if (!owner || !repo || !pullNumber || !projectId) {
-      throw new AppError('owner, repo, pullNumber, and projectId are required', 400, 'VALIDATION_ERROR');
+      throw new AppError('Valid GitHub PR URL (or Owner, Repo, and PR Number) and Target Project are required.', 400, 'VALIDATION_ERROR');
     }
 
     // Validate project ownership
     const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: req.userId }
+      where: { id: projectId, userId: req.userId },
     });
     if (!project) {
       throw new AppError('Project not found or access denied', 404, 'PROJECT_NOT_FOUND');
@@ -37,7 +63,7 @@ const reviewPR = async (req, res, next) => {
 
     return sendSuccess(res, {
       data: { reviews: results, filesReviewed: files.length },
-      message: `PR #${pullNumber} — ${files.length} file(s) reviewed successfully`,
+      message: `PR #${pullNumber} (${owner}/${repo}) — ${files.length} file(s) reviewed successfully`,
       statusCode: 201,
     });
   } catch (error) {

@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 
 export default function PRReviewPage() {
   const queryClient = useQueryClient();
+  const [prUrl, setPrUrl] = useState('');
   const [owner, setOwner] = useState('');
   const [repo, setRepo] = useState('');
   const [pullNumber, setPullNumber] = useState('');
@@ -18,6 +19,17 @@ export default function PRReviewPage() {
   // New Project Inline Creation State
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+
+  // Auto-parse PR URL when pasted
+  const handlePrUrlChange = (val) => {
+    setPrUrl(val);
+    const match = val.trim().match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i);
+    if (match) {
+      setOwner(match[1]);
+      setRepo(match[2]);
+      setPullNumber(match[3]);
+    }
+  };
 
   // Query: User Projects
   const { data: projectsData, isLoading: isProjectsLoading } = useQuery({
@@ -56,12 +68,24 @@ export default function PRReviewPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!owner || !repo || !pullNumber || !projectId) {
-      toast.error('Please fill in all required fields including Target Project.');
+    if (!projectId) {
+      toast.error('Please select or create a Target Project.');
       return;
     }
+
+    if (!prUrl && (!owner || !repo || !pullNumber)) {
+      toast.error('Please enter a GitHub PR URL or specify Owner, Repo, and PR Number.');
+      return;
+    }
+
     setResults(null);
-    reviewPRMutation.mutate({ owner, repo, pullNumber: parseInt(pullNumber, 10), projectId });
+    reviewPRMutation.mutate({
+      prUrl: prUrl.trim() || undefined,
+      owner: owner.trim() || undefined,
+      repo: repo.trim() || undefined,
+      pullNumber: pullNumber ? parseInt(pullNumber, 10) : undefined,
+      projectId,
+    });
   };
 
   const handleCreateProjectSubmit = (e) => {
@@ -158,6 +182,28 @@ export default function PRReviewPage() {
                   ))}
                 </select>
               )}
+            </div>
+
+            {/* GitHub PR URL Quick Paste */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[var(--color-text-secondary)]">
+                GitHub PR URL (Quick Paste)
+              </label>
+              <input
+                type="url"
+                placeholder="https://github.com/facebook/react/pull/28000"
+                disabled={reviewPRMutation.isPending}
+                value={prUrl}
+                onChange={(e) => handlePrUrlChange(e.target.value)}
+                className="w-full px-3 py-2.5 bg-[var(--color-bg-secondary)] border rounded-xl text-xs focus:outline-none transition-all duration-200"
+                style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+              />
+            </div>
+
+            <div className="relative flex items-center gap-2 py-0.5">
+              <div className="flex-1 h-px bg-[var(--color-border)]" />
+              <span className="text-[10px] uppercase font-bold text-[var(--color-text-muted)]">OR Enter Details</span>
+              <div className="flex-1 h-px bg-[var(--color-border)]" />
             </div>
 
             {/* Repository Owner */}
