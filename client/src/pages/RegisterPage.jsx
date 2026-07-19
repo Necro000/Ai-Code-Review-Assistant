@@ -53,6 +53,11 @@ export default function RegisterPage() {
     await registerUserSession(data.name, data.email, data.password);
   };
 
+  const onInvalid = (formErrors) => {
+    const firstError = Object.values(formErrors)[0]?.message;
+    toast.error(firstError || 'Please fill in all required fields.');
+  };
+
   const inputStyle = (hasError) => ({
     backgroundColor: 'var(--color-bg-secondary)',
     border: `1px solid ${hasError ? 'var(--color-error)' : 'var(--color-border)'}`,
@@ -257,7 +262,7 @@ export default function RegisterPage() {
             className="rounded-2xl border p-7 glass"
             style={{ borderColor: 'var(--color-border)' }}
           >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
               {/* Full Name */}
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold" style={{ color: 'var(--color-text-secondary)' }}>

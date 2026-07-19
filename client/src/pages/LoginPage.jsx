@@ -61,6 +61,11 @@ export default function LoginPage() {
     await login(data.email, data.password);
   };
 
+  const onInvalid = (formErrors) => {
+    const firstError = Object.values(formErrors)[0]?.message;
+    toast.error(firstError || 'Please fill in all required fields.');
+  };
+
   return (
     <div
       className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-hidden"
@@ -255,7 +260,7 @@ export default function LoginPage() {
             className="rounded-2xl border p-7 glass"
             style={{ borderColor: 'var(--color-border)' }}
           >
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-5">
               {/* Email */}
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
