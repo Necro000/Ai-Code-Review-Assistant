@@ -206,7 +206,7 @@ export default function WorkspaceDetailPage() {
                       <div className="flex items-center justify-between">
                         <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Recent Reviews</p>
                         <button
-                          onClick={() => navigate('/new-review')}
+                          onClick={() => navigate('/review/new', { state: { selectedProjectId: proj.id } })}
                           className="text-[10px] font-semibold flex items-center gap-1 text-[var(--color-accent-hover)] hover:underline cursor-pointer"
                         >
                           <HiOutlineMagnifyingGlass className="w-3 h-3" />

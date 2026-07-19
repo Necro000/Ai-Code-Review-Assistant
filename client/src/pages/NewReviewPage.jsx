@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { HiOutlineCodeBracket, HiOutlineDocumentArrowUp, HiOutlinePlus, HiOutlineMagnifyingGlass, HiOutlineTrash, HiOutlineChevronDown } from 'react-icons/hi2';
@@ -11,6 +11,7 @@ import { listProjectsAPI, createProjectAPI, deleteProjectAPI, submitSnippetAPI, 
 
 export default function NewReviewPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('paste'); // 'paste' or 'upload'
 
@@ -22,7 +23,7 @@ export default function NewReviewPage() {
   const [files, setFiles] = useState([]);
 
   // Project state
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState(location.state?.selectedProjectId || '');
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [showProjectDropdown, setShowProjectDropdown] = useState(false);

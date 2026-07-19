@@ -35,7 +35,7 @@ export default function Sidebar() {
 
   const initials = user?.name ? user.name[0].toUpperCase() : 'U';
   const displayName = user?.name ? user.name.split(' ')[0] : 'User';
-  const roleLabel = user?.role === 'admin' ? 'Admin' : 'Member';
+  const roleLabel = user?.role === 'admin' ? 'Admin' : 'Developer';
 
   return (
     <aside
