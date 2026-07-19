@@ -3,7 +3,9 @@ const nodemailer = require('nodemailer');
 let transporter;
 
 const getTransporter = () => {
-  if (!process.env.SMTP_HOST) {return null;} // Email disabled — skip silently
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
+    return null;
+  }
 
   if (!transporter) {
     transporter = nodemailer.createTransport({
@@ -21,7 +23,10 @@ const getTransporter = () => {
 
 const sendReviewCompleteEmail = async (toEmail, review) => {
   const transport = getTransporter();
-  if (!transport || !toEmail) {return;} // Not configured or no target email — skip silently
+  if (!transport || !toEmail) {
+    console.log(`[Email Service] SMTP not configured in server/.env. Skipping review email to ${toEmail}.`);
+    return;
+  }
 
   const errorCount = review.findings?.filter(f => f.severity === 'error').length || 0;
   const warningCount = review.findings?.filter(f => f.severity === 'warning').length || 0;
@@ -75,7 +80,10 @@ const sendReviewCompleteEmail = async (toEmail, review) => {
 
 const sendWorkspaceInvitationEmail = async (toEmail, workspaceName, inviterName) => {
   const transport = getTransporter();
-  if (!transport || !toEmail) {return;}
+  if (!transport || !toEmail) {
+    console.log(`[Email Service] SMTP credentials not set in server/.env. Skipping invitation email to ${toEmail}.`);
+    return;
+  }
 
   const html = `
     <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);">
