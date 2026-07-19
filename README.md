@@ -1,60 +1,92 @@
-# AI Code Review Assistant
+# ⚡ AI Code Review Assistant
 
-A modern full-stack web application designed to help developers identify bugs, analyze complexity, fix security vulnerabilities, and level up their code quality using Artificial Intelligence (Groq API) and static analysis tools (ESLint, Pylint).
+A state-of-the-art, full-stack platform designed to accelerate code reviews, detect bugs, calculate complexity, enforce style standards, and provide AI-powered refactoring recommendations across multi-language codebases.
 
 ---
 
-## 🚀 Key Features
+## ✨ Core Features & Highlights
 
-* **Two-Stage Analysis Pipeline**:
-  * **Stage 1 (Static Analysis)**: Runs language-specific linters (ESLint for JavaScript/TypeScript, Pylint for Python) to check syntax correctness, variable declarations, and style patterns.
-  * **Stage 2 (AI Analysis)**: Leverages Groq LLMs (e.g. `llama-3.3-70b-versatile`) to generate deep context-aware feedback, suggest optimal refactoring paths, find hidden bugs, and suggest naming improvements.
-* **Automated Complexity Indexing**: Calculates LOC, functions, class scopes, and computes Cyclomatic Complexity on-the-fly.
-* **Stateless Cookie Authentication**: Secure user session tracking using JWT access tokens (15m expiry) and httpOnly refresh cookies (7d expiry) with rate-limiting constraints.
-* **Project Organization**: Manage reviews under contextual project categories.
-* **Searchable Review History**: Quickly query, filter by severity, and paginate past code reviews.
-* **Interactive Code Viewer**: Click on issues/findings to auto-scroll and highlight lines in the code view.
-* **Design System UI**: Vibrant glassmorphic layouts, dark mode variables, and micro-animations.
+- 🌐 **Multi-Language Static Analysis**:
+  - **JavaScript & TypeScript**: Powered by ESLint.
+  - **Python**: Powered by Pylint.
+  - **Java**: Powered by Checkstyle.
+  - **C & C++**: Powered by Cppcheck.
+  - **AI Analysis**: Context-aware evaluations across all major programming languages.
+- 🔑 **GitHub OAuth 2.0 & Email Authentication**:
+  - One-click sign-in via GitHub OAuth or password-based email registration.
+  - Automatic profile picture (`avatarUrl`) and GitHub account syncing.
+- 🔀 **Pull Request Review Integration**:
+  - Direct URL ingestion for public GitHub Pull Requests (e.g. `https://github.com/owner/repo/pull/42`).
+  - Automated diff parsing, per-file linter evaluation, and aggregate PR quality score reports.
+- 👥 **Team Workspaces & Collaborator Invitations**:
+  - Create dedicated team workspaces to organize project reviews and share repository insights.
+  - Member role management (`owner`, `member`) and email invitation workflows.
+- ⚡ **Real-Time Collaboration**:
+  - Powered by Socket.io for live session rooms.
+  - Broadcast real-time comments, inline code highlights, and active collaborator badges.
+- 🤖 **AI-Powered Refactoring Recommendations**:
+  - Integrates Google Gemini & Groq LLMs (`llama-3.3-70b-versatile`) to generate line-annotated bug explanations and ready-to-use refactored code fixes (`suggestedFix`).
+- 📊 **Code Quality Scoring System (0–100)**:
+  - Automated scoring algorithm evaluating static linter error penalties, warning density, and AI severity metrics.
+- 📈 **Interactive Charts & Analytics**:
+  - Built with Recharts: interactive area charts for score trends, pie charts for severity distributions, and language breakdown analytics.
+- 🌓 **Dark & Light Mode Themes**:
+  - Dynamic CSS variables supporting seamless theme switching with persistence in local storage.
+- 📧 **Email Notifications**:
+  - Automatic HTML review summary emails sent via Nodemailer/SMTP upon completion of long-running reviews.
+- 🏆 **Code Quality Leaderboard**:
+  - Public developer rankings based on average review quality scores, tracking rank badges (🥇, 🥈, 🥉) and score improvement trends.
+- 🛡️ **Admin Dashboard**:
+  - Protected admin console (`/admin`) to inspect system-wide review stats, audit platform users, and adjust user access roles.
+- 🐳 **Full Docker & Docker Compose Support**:
+  - Pre-configured `Dockerfile.client`, `Dockerfile.server`, and `docker-compose.yml` for instant production containerized deployment.
+- 🚀 **Automated CI/CD Pipelines**:
+  - GitHub Actions workflows for continuous integration (`ci.yml`) and continuous deployment (`deploy.yml`) to GitHub Container Registry (GHCR) and Render.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technologies |
+| Category | Technologies Used |
 |---|---|
-| **Frontend** | React (Vite), Tailwind CSS v4, React Router v7, TanStack Query v5, React Hook Form, React Icons |
-| **Backend** | Node.js, Express, Multer (file uploading), JWT, bcryptjs, express-rate-limit |
+| **Frontend** | React 19 (Vite), Tailwind CSS v4, React Router v7, TanStack React Query v5, React Hook Form, Recharts, Socket.io-client, React Icons |
+| **Backend** | Node.js, Express.js, Socket.io, Passport.js (GitHub OAuth 2.0), JWT (Access + Refresh cookies), Nodemailer, Bcryptjs, Express Rate Limit |
 | **Database** | PostgreSQL / Supabase, Prisma ORM |
-| **Analysis / AI** | Groq Cloud SDK, ESLint, Pylint |
+| **Linters & AI** | ESLint v8, Pylint, Checkstyle, Cppcheck, Google Gemini API, Groq Cloud API |
+| **DevOps & Infra** | Docker, Docker Compose, GitHub Actions, Nginx |
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Architecture
 
 ```
-ai-code-review-assistant/
+Ai-Code-Review-Assistant/
+├── .github/
+│   └── workflows/              # GitHub Actions CI/CD pipelines
+│       ├── ci.yml              # Linting, Prisma validation, & client build checks
+│       └── deploy.yml          # Container build & deployment pipeline
 ├── client/                     # Frontend SPA (React + Vite)
 │   ├── src/
-│   │   ├── api/                # API Request hooks (Axios instance)
-│   │   ├── components/         # Layouts, editor sheets, and panels
-│   │   ├── context/            # AuthContext provider
-│   │   ├── hooks/              # Reusable custom hooks
-│   │   ├── pages/              # View pages (Login, Register, Dashboard, History, Report details)
-│   │   └── index.css           # Design token styling sheet
-│   └── package.json
-│
-├── server/                     # Backend API (Express)
-│   ├── prisma/                 # Prisma migrations & schema
+│   │   ├── api/                # Axios API request clients
+│   │   ├── components/         # Layouts, Navbar, Sidebar, ScoreBadges, CollaboratorsBar
+│   │   ├── context/            # AuthContext & ThemeContext
+│   │   ├── hooks/              # Reusable hooks (useAuth, useCollaboration, useTheme)
+│   │   ├── pages/              # Dashboard, PRReview, Workspace, Leaderboard, Admin, Profile
+│   │   └── index.css           # Global CSS variables & design tokens
+│   └── vite.config.js
+├── server/                     # Backend REST API & WebSocket Server (Express)
+│   ├── prisma/                 # Prisma database schema & migrations
 │   ├── src/
-│   │   ├── config/             # DB, environment, and Groq connections
-│   │   ├── controllers/        # Request handlers
-│   │   ├── middleware/         # JWT, validator, error, and rate-limit rules
-│   │   ├── routes/             # API routes
-│   │   ├── services/           # Pipelines: Static linting, AI review, and complexity calculator
-│   │   └── utils/              # AppError wrappers
-│   ├── server.js               # Entry point
-│   └── package.json
-│
+│   │   ├── config/             # DB, Passport OAuth, & Environment configs
+│   │   ├── controllers/        # Express controllers (auth, review, pr, workspace, admin)
+│   │   ├── middleware/         # Auth JWT, rate limiters, & input validators
+│   │   ├── routes/             # API endpoints (/api/auth, /api/review, /api/pr, etc.)
+│   │   ├── services/           # Linters, AI Orchestrator, Email, Leaderboard services
+│   │   └── utils/              # Score calculator & response formatters
+│   └── app.js                  # Express & Socket.io server entry point
+├── Dockerfile.client           # Nginx container definition for frontend
+├── Dockerfile.server           # Node.js container definition for backend API
+├── docker-compose.yml          # Multi-container orchestration (PostgreSQL + API + Client)
 └── README.md
 ```
 
@@ -63,90 +95,129 @@ ai-code-review-assistant/
 ## ⚙️ Local Development Setup
 
 ### 1. Prerequisites
-Ensure you have the following installed on your machine:
-* [Node.js](https://nodejs.org/) (version 18 or higher)
-* [PostgreSQL](https://www.postgresql.org/) (or a running [Supabase](https://supabase.com/) project)
-* Python (required if Pylint Python checks are desired locally)
-
-### 2. Configure Environment Variables
-Navigate to the `server/` directory, copy the template `.env.example` file to `.env`, and populate the variables:
-
-```bash
-cd server
-copy .env.example .env
-```
-
-Set these variables in your `.env`:
-* `DATABASE_URL`: Your PostgreSQL connection string.
-* `GROQ_API_KEY`: Your Groq Cloud API developer key.
-* `JWT_SECRET` and `JWT_REFRESH_SECRET`: Random 32-character hashes.
-
-### 3. Install Server Dependencies & Deploy DB
-From the `server/` directory, run:
-
-```bash
-# Install dependencies
-npm install
-
-# Deploy database migrations and generate client
-npx prisma migrate dev --name init
-npx prisma generate
-```
-
-### 4. Install Client Dependencies
-Open a separate terminal window, navigate to the `client/` directory, and run:
-
-```bash
-cd client
-npm install
-```
-
-### 5. Start Servers
-
-* **Start Backend API (Server)** (runs on `http://localhost:5000`):
-  ```bash
-  cd server
-  npm run dev
-  ```
-  
-* **Start Frontend Dev Server** (runs on `http://localhost:5173`):
-  ```bash
-  cd client
-  npm run dev
-  ```
-
-Visit `http://localhost:5173` in your browser.
+Ensure you have the following installed on your development machine:
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [PostgreSQL](https://www.postgresql.org/) (or a running [Supabase](https://supabase.com/) database)
+- [Python 3](https://www.python.org/) (optional, required if running Pylint locally)
+- [Java JDK](https://www.oracle.com/java/) & [Cppcheck](http://cppcheck.sourceforge.net/) (optional, for Checkstyle / Cppcheck local execution)
 
 ---
 
-## 🐳 Containerized Deployment (Docker)
+### 2. Backend Setup (`server/`)
 
-You can launch the entire stack (PostgreSQL database, backend REST API, and Nginx client frontend) inside Docker containers.
+1. Navigate to the `server/` directory:
+   ```bash
+   cd server
+   ```
 
-### Run with Docker Compose
-1. Ensure your environment configurations are populated in `server/.env` (database connection credentials will be automatically overridden by Docker service links).
-2. Launch the services from the project root directory:
+2. Copy the environment configuration template:
+   ```bash
+   copy .env.example .env
+   ```
+
+3. Update the `.env` file with your credentials:
+   ```env
+   PORT=5000
+   NODE_ENV=development
+   CLIENT_URL=http://localhost:5173
+   SERVER_URL=http://localhost:5000
+
+   # Database Connection
+   DATABASE_URL="postgresql://postgres:password@localhost:5432/code_review_db?schema=public"
+
+   # JWT Secrets
+   JWT_SECRET=your_super_secret_access_jwt_key
+   JWT_REFRESH_SECRET=your_super_secret_refresh_jwt_key
+
+   # AI Provider API Keys
+   GEMINI_API_KEY=your_google_gemini_api_key
+   GROQ_API_KEY=your_groq_cloud_api_key
+
+   # GitHub OAuth Credentials (Optional)
+   GITHUB_CLIENT_ID=your_github_oauth_client_id
+   GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+
+   # SMTP Email Credentials (Optional)
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASS=your_app_password
+   SMTP_FROM="AI Code Review" <noreply@aicra.dev>
+   ```
+
+4. Install dependencies and run database migrations:
+   ```bash
+   npm install
+   npx prisma migrate dev --name init
+   npx prisma generate
+   ```
+
+5. Start the backend development server:
+   ```bash
+   npm run dev
+   ```
+   The backend API will run on `http://localhost:5000`.
+
+---
+
+### 3. Frontend Setup (`client/`)
+
+1. Open a new terminal window and navigate to `client/`:
+   ```bash
+   cd client
+   ```
+
+2. Install frontend dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the Vite frontend dev server:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173` in your web browser.
+
+---
+
+## 🐳 Docker Deployment
+
+You can launch the entire stack (PostgreSQL database, Node.js backend server, and Nginx frontend client) using Docker Compose:
+
+1. Ensure Docker Desktop is installed and running.
+2. Run the following command from the root project directory:
    ```bash
    docker compose up -d --build
    ```
-3. The services are mapped as follows:
-   - **Frontend App**: `http://localhost` (Port 80)
-   - **Backend API**: `http://localhost:5000` (Port 5000)
+3. Access the services:
+   - **Web Application**: `http://localhost`
+   - **Backend API**: `http://localhost:5000`
+
+To stop the containers:
+```bash
+docker compose down
+```
 
 ---
 
-## 🛠️ CI/CD Deployment Pipelines
+## 🚀 CI/CD Pipeline
 
-We use GitHub Actions to automate code validation and Docker deployments.
+The project includes pre-configured **GitHub Actions** workflows in `.github/workflows/`:
 
-- **CI Workflows (`ci.yml`)**: Lint the server code, perform schema validation on the Prisma DB definition, and ensure the React application compiles without errors. This runs on every push and pull request targeting the `main` branch.
-- **CD Workflows (`deploy.yml`)**: Auto-builds both client and server images on push to the `main` branch, tags and pushes them to **GitHub Container Registry (GHCR)**, and triggers a redeployment webhook to **Render**.
+- **CI (`ci.yml`)**: Triggered on pull requests and pushes to `main`. Runs ESLint validation on server code, verifies Prisma DB schema consistency, and runs Vite client build checks (`npm run build`).
+- **CD (`deploy.yml`)**: Triggered on push to `main`. Automatically builds Docker container images, publishes them to GitHub Container Registry (GHCR), and triggers automatic deployment webhooks.
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## 🔒 Security Best Practices
 
-* **No Plaintext Code Storage**: Files uploaded to the server are parsed temporarily in memory or `/tmp` directories and permanently unlinked right after evaluation.
-* **Token Hardening**: Access tokens are kept in short-lived memory; refresh tokens are secured in HttpOnly cookies with CSRF SameSite controls.
-* **Sandbox Environment Execution**: Code snippets are strictly analyzed as strings via lint CLI outputs and LLMs. The server never compiles or executes (`eval`) submitted files.
-* **SQL Injection Mitigation**: All DB calls utilize Prisma Parameterized Query bindings.
+- **Token Hardening**: Access tokens are kept in short-lived memory; refresh tokens are stored in `httpOnly`, `sameSite`, and `secure` HTTP cookies.
+- **No Unsafe Execution**: Submitted source code is analyzed strictly as static text strings through linters and LLMs. Code is never evaluated (`eval`) or compiled directly on the host OS.
+- **Parameterized Queries**: All database queries utilize Prisma ORM parameterized SQL bindings, preventing SQL injection vulnerabilities.
+- **Rate Limiting**: Public auth and analysis endpoints are protected using `express-rate-limit` against brute-force attacks.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
