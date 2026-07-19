@@ -280,14 +280,17 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     placeholder="John Doe"
+                    autoComplete="name"
                     className="w-full pl-12 pr-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={inputStyle(!!errors.name)}
                     onFocus={(e) => onInputFocus(e, !!errors.name)}
                     onBlur={(e) => onInputBlur(e, !!errors.name)}
                     {...register('name', {
                       required: 'Full Name is required',
-                      minLength: { value: 2, message: 'Minimum 2 characters' },
-                      maxLength: { value: 50, message: 'Maximum 50 characters' },
+                      pattern: {
+                        value: /^[a-zA-Z\s'-]{2,50}$/,
+                        message: 'Full Name must contain letters only (numbers & symbols are not allowed)',
+                      },
                     })}
                   />
                 </div>
@@ -308,6 +311,7 @@ export default function RegisterPage() {
                   <input
                     type="email"
                     placeholder="john@example.com"
+                    autoComplete="email"
                     className="w-full pl-12 pr-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={inputStyle(!!errors.email)}
                     onFocus={(e) => onInputFocus(e, !!errors.email)}
@@ -338,6 +342,7 @@ export default function RegisterPage() {
                   <input
                     type="password"
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     className="w-full pl-12 pr-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={inputStyle(!!errors.password)}
                     onFocus={(e) => onInputFocus(e, !!errors.password)}
@@ -368,6 +373,7 @@ export default function RegisterPage() {
                   <input
                     type="password"
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     className="w-full pl-12 pr-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={inputStyle(!!errors.confirmPassword)}
                     onFocus={(e) => onInputFocus(e, !!errors.confirmPassword)}
