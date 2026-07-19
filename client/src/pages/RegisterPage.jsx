@@ -56,7 +56,7 @@ export default function RegisterPage() {
   const onInvalid = (formErrors) => {
     const errorMessages = Object.values(formErrors).map((e) => e.message).filter(Boolean);
     if (errorMessages.length > 0) {
-      errorMessages.forEach((msg) => toast.error(msg));
+      toast.error(errorMessages[0]);
     } else {
       toast.error('Please fill in all required fields correctly.');
     }
@@ -285,12 +285,8 @@ export default function RegisterPage() {
                     onBlur={(e) => onInputBlur(e, !!errors.name)}
                     {...register('name', {
                       required: 'Full Name is required',
-                      validate: (val) => {
-                        if (!val || !val.trim()) return 'Full Name is required';
-                        if (/^\d+$/.test(val.trim())) return 'Full Name cannot be numbers only (e.g. 1232)';
-                        if (!/^[a-zA-Z\s'-]{2,50}$/.test(val.trim())) return 'Full Name must contain letters only (numbers & symbols are not allowed)';
-                        return true;
-                      },
+                      minLength: { value: 2, message: 'Minimum 2 characters' },
+                      maxLength: { value: 50, message: 'Maximum 50 characters' },
                     })}
                   />
                 </div>
@@ -347,9 +343,9 @@ export default function RegisterPage() {
                     onBlur={(e) => onInputBlur(e, !!errors.password)}
                     {...register('password', {
                       required: 'Password is required',
-                      pattern: {
-                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-                        message: 'Min 8 chars · uppercase · lowercase · number',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters long',
                       },
                     })}
                   />

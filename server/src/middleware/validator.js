@@ -6,18 +6,14 @@ const AppError = require('../utils/AppError');
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Regex for full name: letters, spaces, hyphens, and apostrophes (2 to 50 chars)
+ * Regex for full name: alphanumeric, spaces, hyphens, and apostrophes (2 to 50 chars)
  */
-const NAME_REGEX = /^[a-zA-Z\s'-]{2,50}$/;
+const NAME_REGEX = /^[a-zA-Z0-9\s'-]{2,50}$/;
 
 /**
- * Regex for password complexity:
- * - At least 8 characters long
- * - At least 1 uppercase letter
- * - At least 1 lowercase letter
- * - At least 1 number
+ * Regex for password: at least 6 characters long
  */
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const PASSWORD_REGEX = /^.{6,}$/;
 
 /**
  * Middleware to validate registration request body.
@@ -27,7 +23,7 @@ const validateRegister = (req, res, next) => {
   const errors = [];
 
   if (!name || typeof name !== 'string' || !NAME_REGEX.test(name.trim())) {
-    errors.push({ field: 'name', message: 'Full Name must contain 2 to 50 letters (numbers and special characters are not allowed).' });
+    errors.push({ field: 'name', message: 'Full Name must be between 2 and 50 characters long.' });
   }
 
   if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
@@ -37,7 +33,7 @@ const validateRegister = (req, res, next) => {
   if (!password || typeof password !== 'string' || !PASSWORD_REGEX.test(password)) {
     errors.push({
       field: 'password',
-      message: 'Password must be at least 8 characters long, and contain at least one uppercase letter, one lowercase letter, and one number.',
+      message: 'Password must be at least 6 characters long.',
     });
   }
 
