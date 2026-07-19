@@ -1,5 +1,6 @@
 const { prisma } = require('../config/db');
 const AppError = require('../utils/AppError');
+const { sendWorkspaceInvitationEmail } = require('./emailService');
 
 const assertOwner = async (workspaceId, userId) => {
   const ws = await prisma.workspace.findFirst({
@@ -113,7 +114,12 @@ const getWorkspaceById = async (workspaceId, userId) => {
 };
 
 const inviteMember = async (workspaceId, inviterUserId, inviteeEmail) => {
-  await assertOwner(workspaceId, inviterUserId);
+  const ws = await assertOwner(workspaceId, inviterUserId);
+
+  const inviter = await prisma.user.findUnique({
+    where: { id: inviterUserId },
+    select: { name: true, email: true }
+  });
 
   const normalizedEmail = inviteeEmail.toLowerCase().trim();
   const invitee = await prisma.user.findUnique({
@@ -121,7 +127,7 @@ const inviteMember = async (workspaceId, inviterUserId, inviteeEmail) => {
   });
 
   if (!invitee) {
-    throw new AppError(`User with email "${inviteeEmail}" not found`, 404, 'USER_NOT_FOUND');
+    throw new AppError(`User with email "${inviteeEmail}" not found. They must register an account first.`, 404, 'USER_NOT_FOUND');
   }
 
   // Check if already a member
@@ -138,7 +144,7 @@ const inviteMember = async (workspaceId, inviterUserId, inviteeEmail) => {
     throw new AppError('User is already a member of this workspace', 409, 'ALREADY_MEMBER');
   }
 
-  return await prisma.workspaceMember.create({
+  const newMember = await prisma.workspaceMember.create({
     data: {
       workspaceId,
       userId: invitee.id,
@@ -150,6 +156,13 @@ const inviteMember = async (workspaceId, inviterUserId, inviteeEmail) => {
       }
     }
   });
+
+  // Send invitation notification email in background
+  sendWorkspaceInvitationEmail(invitee.email, ws.name, inviter?.name || inviter?.email).catch((err) => {
+    console.error('Failed to send workspace invitation email:', err.message);
+  });
+
+  return newMember;
 };
 
 const removeMember = async (workspaceId, inviterUserId, userIdToRemove) => {
