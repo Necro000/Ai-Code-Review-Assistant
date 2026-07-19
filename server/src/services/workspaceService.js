@@ -212,7 +212,9 @@ const addProjectToWorkspace = async (workspaceId, userId, projectId) => {
 const createWorkspaceProject = async (workspaceId, userId, projectName, githubUrl) => {
   await assertMember(workspaceId, userId);
 
-  if (!projectName || projectName.trim() === '') {
+  const nameStr = typeof projectName === 'string' ? projectName : (projectName?.projectName || '');
+
+  if (!nameStr || nameStr.trim() === '') {
     throw new AppError('Project name is required', 400, 'VALIDATION_ERROR');
   }
 
@@ -220,8 +222,8 @@ const createWorkspaceProject = async (workspaceId, userId, projectName, githubUr
     data: {
       userId,
       workspaceId,
-      projectName: projectName.trim(),
-      githubUrl: githubUrl ? githubUrl.trim() : null
+      projectName: nameStr.trim(),
+      githubUrl: typeof githubUrl === 'string' ? githubUrl.trim() : null
     }
   });
 };

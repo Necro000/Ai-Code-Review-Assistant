@@ -5,15 +5,17 @@ const AppError = require('../utils/AppError');
  * Create a new project
  */
 const createProject = async (userId, projectName, githubUrl, workspaceId = null) => {
-  if (!projectName || projectName.trim().length === 0) {
+  const nameStr = typeof projectName === 'string' ? projectName : (projectName?.projectName || '');
+
+  if (!nameStr || nameStr.trim().length === 0) {
     throw new AppError('Project name is required', 400, 'PROJECT_NAME_REQUIRED');
   }
 
   return await prisma.project.create({
     data: {
       userId,
-      projectName: projectName.trim(),
-      githubUrl: githubUrl ? githubUrl.trim() : null,
+      projectName: nameStr.trim(),
+      githubUrl: typeof githubUrl === 'string' ? githubUrl.trim() : null,
       workspaceId: workspaceId || null,
     },
   });
@@ -55,10 +57,11 @@ const updateProject = async (userId, projectId, data) => {
   const updateData = {};
 
   if (projectName !== undefined) {
-    if (projectName.trim().length === 0) {
+    const nameStr = typeof projectName === 'string' ? projectName : (projectName?.projectName || '');
+    if (nameStr.trim().length === 0) {
       throw new AppError('Project name cannot be empty', 400, 'PROJECT_NAME_REQUIRED');
     }
-    updateData.projectName = projectName.trim();
+    updateData.projectName = nameStr.trim();
   }
 
   if (githubUrl !== undefined) {
