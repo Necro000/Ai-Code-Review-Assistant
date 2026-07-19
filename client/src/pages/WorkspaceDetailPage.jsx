@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getWorkspaceAPI, deleteWorkspaceAPI } from '../api/workspaces';
+import { getWorkspaceAPI, deleteWorkspaceAPI, createWorkspaceProjectAPI } from '../api/workspaces';
 import MemberList from '../components/workspace/MemberList';
 import useAuth from '../hooks/useAuth';
-import { HiOutlineArrowLeft, HiOutlineTrash, HiOutlineFolderOpen, HiOutlineDocumentText } from 'react-icons/hi2';
+import { HiOutlineArrowLeft, HiOutlineTrash, HiOutlineFolderOpen, HiOutlinePlus, HiOutlineMagnifyingGlass } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
 export default function WorkspaceDetailPage() {
@@ -11,6 +12,9 @@ export default function WorkspaceDetailPage() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
+
+  const [isAddingProject, setIsAddingProject] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['workspace', id],
@@ -30,10 +34,33 @@ export default function WorkspaceDetailPage() {
     },
   });
 
+  const createProjectMutation = useMutation({
+    mutationFn: (projectName) => createWorkspaceProjectAPI(id, projectName),
+    onSuccess: (res) => {
+      toast.success(res.message || 'Workspace project created successfully');
+      queryClient.invalidateQueries(['workspace', id]);
+      setIsAddingProject(false);
+      setNewProjectName('');
+    },
+    onError: (err) => {
+      const errMsg = err.response?.data?.error?.message || 'Failed to create workspace project.';
+      toast.error(errMsg);
+    },
+  });
+
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this workspace? All member relationships will be deleted. Projects will persist.')) {
       deleteMutation.mutate();
     }
+  };
+
+  const handleCreateProjectSubmit = (e) => {
+    e.preventDefault();
+    if (!newProjectName.trim()) {
+      toast.error('Project name cannot be empty');
+      return;
+    }
+    createProjectMutation.mutate(newProjectName.trim());
   };
 
   if (isLoading) {
@@ -104,30 +131,81 @@ export default function WorkspaceDetailPage() {
         {/* Workspace Projects */}
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-2xl border p-6 bg-[var(--color-surface)] border-[var(--color-border)] space-y-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-[var(--color-text)]">
-              <HiOutlineFolderOpen className="w-5 h-5 text-[var(--color-accent)]" />
-              Workspace Projects ({workspace.projects?.length || 0})
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-bold text-[var(--color-text)]">
+                <HiOutlineFolderOpen className="w-5 h-5 text-[var(--color-accent)]" />
+                Workspace Projects ({workspace.projects?.length || 0})
+              </div>
+
+              {!isAddingProject && (
+                <button
+                  onClick={() => setIsAddingProject(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-bold rounded-xl cursor-pointer transition-colors shadow-sm"
+                >
+                  <HiOutlinePlus className="w-4 h-4" />
+                  Create Workspace Project
+                </button>
+              )}
             </div>
+
+            {isAddingProject && (
+              <form onSubmit={handleCreateProjectSubmit} className="flex gap-2 p-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl">
+                <input
+                  type="text"
+                  placeholder="Project name (e.g. Shared Backend)"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-xs text-[var(--color-text)] focus:outline-none"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  disabled={createProjectMutation.isPending}
+                  className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-bold rounded-lg cursor-pointer"
+                >
+                  {createProjectMutation.isPending ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingProject(false)}
+                  className="px-3 py-2 bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] text-xs font-bold rounded-lg cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </form>
+            )}
             
             {workspace.projects?.length === 0 ? (
-              <p className="text-xs text-[var(--color-text-muted)] py-4">
-                No projects associated with this workspace yet. Connect a project to get started.
-              </p>
+              <div className="py-8 text-center space-y-3">
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  No projects associated with this workspace yet. Click "Create Workspace Project" above to start collaborating with your team.
+                </p>
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {workspace.projects.map((proj) => (
-                  <div key={proj.id} className="p-4 rounded-xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)] space-y-3">
-                    <div>
+                  <div key={proj.id} className="p-4 rounded-xl bg-[var(--color-bg-secondary)] border border-[var(--color-border)] space-y-3 flex flex-col justify-between">
+                    <div className="space-y-1">
                       <h4 className="text-sm font-bold text-[var(--color-text)]">{proj.projectName}</h4>
                       {proj.githubUrl && (
-                        <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[var(--color-accent-hover)] hover:underline truncate block mt-1">
+                        <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[var(--color-accent-hover)] hover:underline truncate block">
                           {proj.githubUrl}
                         </a>
                       )}
                     </div>
 
-                    <div className="border-t border-[var(--color-border)] pt-3">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-2">Recent Reviews</p>
+                    <div className="border-t border-[var(--color-border)] pt-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Recent Reviews</p>
+                        <button
+                          onClick={() => navigate('/new-review')}
+                          className="text-[10px] font-semibold flex items-center gap-1 text-[var(--color-accent-hover)] hover:underline cursor-pointer"
+                        >
+                          <HiOutlineMagnifyingGlass className="w-3 h-3" />
+                          New Review
+                        </button>
+                      </div>
+
                       {proj.reviews?.length === 0 ? (
                         <p className="text-[10px] text-[var(--color-text-muted)]">No reviews yet.</p>
                       ) : (

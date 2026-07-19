@@ -29,3 +29,13 @@ export const deleteWorkspaceAPI = async (id) => {
   const { data } = await api.delete(`/workspaces/${id}`);
   return data;
 };
+
+export const addWorkspaceProjectAPI = async (id, projectId) => {
+  const { data } = await api.post(`/workspaces/${id}/projects`, { projectId });
+  return data;
+};
+
+export const createWorkspaceProjectAPI = async (id, projectName, githubUrl) => {
+  const { data } = await api.post(`/workspaces/${id}/create-project`, { projectName, githubUrl });
+  return data;
+};

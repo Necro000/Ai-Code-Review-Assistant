@@ -11,6 +11,8 @@ router.post('/', workspaceController.create);
 router.get('/', workspaceController.list);
 router.get('/:id', workspaceController.getById);
 router.post('/:id/invite', workspaceController.invite);
+router.post('/:id/projects', workspaceController.addProject);
+router.post('/:id/create-project', workspaceController.createProject);
 router.delete('/:id/members/:userId', workspaceController.remove);
 router.delete('/:id', workspaceController.delete);
 

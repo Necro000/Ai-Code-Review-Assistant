@@ -4,7 +4,7 @@ const AppError = require('../utils/AppError');
 /**
  * Create a new project
  */
-const createProject = async (userId, projectName, githubUrl) => {
+const createProject = async (userId, projectName, githubUrl, workspaceId = null) => {
   if (!projectName || projectName.trim().length === 0) {
     throw new AppError('Project name is required', 400, 'PROJECT_NAME_REQUIRED');
   }
@@ -14,6 +14,7 @@ const createProject = async (userId, projectName, githubUrl) => {
       userId,
       projectName: projectName.trim(),
       githubUrl: githubUrl ? githubUrl.trim() : null,
+      workspaceId: workspaceId || null,
     },
   });
 };
@@ -50,7 +51,7 @@ const getProjectById = async (userId, projectId) => {
  * Update project details
  */
 const updateProject = async (userId, projectId, data) => {
-  const { projectName, githubUrl } = data;
+  const { projectName, githubUrl, workspaceId } = data;
   const updateData = {};
 
   if (projectName !== undefined) {
@@ -62,6 +63,10 @@ const updateProject = async (userId, projectId, data) => {
 
   if (githubUrl !== undefined) {
     updateData.githubUrl = githubUrl ? githubUrl.trim() : null;
+  }
+
+  if (workspaceId !== undefined) {
+    updateData.workspaceId = workspaceId || null;
   }
 
   // Ensure project exists and belongs to user

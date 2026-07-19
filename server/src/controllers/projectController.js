@@ -6,8 +6,8 @@ const { sendSuccess } = require('../utils/responseFormatter');
  */
 const create = async (req, res, next) => {
   try {
-    const { projectName, githubUrl } = req.body;
-    const project = await projectService.createProject(req.userId, projectName, githubUrl);
+    const { projectName, githubUrl, workspaceId } = req.body;
+    const project = await projectService.createProject(req.userId, projectName, githubUrl, workspaceId);
     
     return sendSuccess(res, {
       data: { project },

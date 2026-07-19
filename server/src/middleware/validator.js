@@ -6,9 +6,9 @@ const AppError = require('../utils/AppError');
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Regex for full name: alphanumeric, spaces, hyphens, and apostrophes (2 to 50 chars)
+ * Regex for full name: letters, spaces, hyphens, and apostrophes (2 to 50 chars)
  */
-const NAME_REGEX = /^[a-zA-Z0-9\s'-]{2,50}$/;
+const NAME_REGEX = /^[a-zA-Z\s'-]{2,50}$/;
 
 /**
  * Regex for password: at least 6 characters long
@@ -23,7 +23,7 @@ const validateRegister = (req, res, next) => {
   const errors = [];
 
   if (!name || typeof name !== 'string' || !NAME_REGEX.test(name.trim())) {
-    errors.push({ field: 'name', message: 'Full Name must be between 2 and 50 characters long.' });
+    errors.push({ field: 'name', message: 'Full Name must contain letters only (numbers and special characters are not allowed).' });
   }
 
   if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {

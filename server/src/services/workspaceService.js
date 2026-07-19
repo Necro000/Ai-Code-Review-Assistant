@@ -192,6 +192,40 @@ const deleteWorkspace = async (workspaceId, userId) => {
   return { message: 'Workspace deleted successfully' };
 };
 
+const addProjectToWorkspace = async (workspaceId, userId, projectId) => {
+  await assertMember(workspaceId, userId);
+
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, userId }
+  });
+
+  if (!project) {
+    throw new AppError('Project not found or access denied', 404, 'PROJECT_NOT_FOUND');
+  }
+
+  return await prisma.project.update({
+    where: { id: projectId },
+    data: { workspaceId }
+  });
+};
+
+const createWorkspaceProject = async (workspaceId, userId, projectName, githubUrl) => {
+  await assertMember(workspaceId, userId);
+
+  if (!projectName || projectName.trim() === '') {
+    throw new AppError('Project name is required', 400, 'VALIDATION_ERROR');
+  }
+
+  return await prisma.project.create({
+    data: {
+      userId,
+      workspaceId,
+      projectName: projectName.trim(),
+      githubUrl: githubUrl ? githubUrl.trim() : null
+    }
+  });
+};
+
 module.exports = {
   createWorkspace,
   listWorkspaces,
@@ -199,5 +233,7 @@ module.exports = {
   inviteMember,
   removeMember,
   deleteWorkspace,
+  addProjectToWorkspace,
+  createWorkspaceProject,
   assertMember
 };

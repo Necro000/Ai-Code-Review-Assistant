@@ -75,6 +75,33 @@ const deleteWorkspace = async (req, res, next) => {
   }
 };
 
+const addProject = async (req, res, next) => {
+  try {
+    const { projectId } = req.body;
+    const project = await workspaceService.addProjectToWorkspace(req.params.id, req.userId, projectId);
+    return sendSuccess(res, {
+      data: { project },
+      message: 'Project connected to workspace successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createProject = async (req, res, next) => {
+  try {
+    const { projectName, githubUrl } = req.body;
+    const project = await workspaceService.createWorkspaceProject(req.params.id, req.userId, projectName, githubUrl);
+    return sendSuccess(res, {
+      data: { project },
+      message: 'Workspace project created successfully',
+      statusCode: 201,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   create,
   list,
@@ -82,4 +109,6 @@ module.exports = {
   invite,
   remove,
   delete: deleteWorkspace,
+  addProject,
+  createProject,
 };
