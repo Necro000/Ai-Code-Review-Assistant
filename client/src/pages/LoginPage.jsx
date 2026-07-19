@@ -280,6 +280,7 @@ export default function LoginPage() {
                   <input
                     type="email"
                     placeholder="name@example.com"
+                    autoComplete="email"
                     className="w-full pl-12 pr-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={{
                       backgroundColor: 'var(--color-bg-secondary)',
@@ -334,6 +335,7 @@ export default function LoginPage() {
                   <input
                     type="password"
                     placeholder="••••••••"
+                    autoComplete="current-password"
                     className="w-full pl-12 pr-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all duration-200"
                     style={{
                       backgroundColor: 'var(--color-bg-secondary)',
