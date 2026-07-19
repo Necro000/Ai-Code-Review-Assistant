@@ -66,16 +66,29 @@ export default function PRReviewPage() {
     },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!projectId) {
-      toast.error('Please select or create a Target Project.');
-      return;
-    }
 
     if (!prUrl && (!owner || !repo || !pullNumber)) {
       toast.error('Please enter a GitHub PR URL or specify Owner, Repo, and PR Number.');
       return;
+    }
+
+    let targetProjectId = projectId;
+
+    // Auto-create project if new user hasn't selected or created one yet
+    if (!targetProjectId) {
+      try {
+        const autoName = repo ? `${repo} PRs` : 'My PR Reviews';
+        const newProjRes = await createProjectAPI({ projectName: autoName });
+        targetProjectId = newProjRes.data.project.id;
+        setProjectId(targetProjectId);
+        queryClient.invalidateQueries(['projects']);
+        toast.success(`Created project "${autoName}" for your reviews!`);
+      } catch (err) {
+        toast.error('Please select or create a Target Project.');
+        return;
+      }
     }
 
     setResults(null);
@@ -84,7 +97,7 @@ export default function PRReviewPage() {
       owner: owner.trim() || undefined,
       repo: repo.trim() || undefined,
       pullNumber: pullNumber ? parseInt(pullNumber, 10) : undefined,
-      projectId,
+      projectId: targetProjectId,
     });
   };
 
