@@ -21,6 +21,7 @@ function errorHandler(err, req, res, _next) {
       message: err.message,
       statusCode: err.statusCode,
       errorCode: err.errorCode,
+      details: err.details,
     });
   }
 

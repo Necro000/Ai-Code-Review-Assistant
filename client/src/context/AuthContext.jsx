@@ -128,8 +128,15 @@ export function AuthProvider({ children }) {
       navigate('/dashboard');
       return true;
     } catch (error) {
-      const errorMsg = error.response?.data?.error?.message || 'Login failed. Please check credentials.';
-      toast.error(errorMsg);
+      const errorObj = error.response?.data?.error;
+      if (errorObj?.details && Array.isArray(errorObj.details) && errorObj.details.length > 0) {
+        errorObj.details.forEach((detail) => {
+          toast.error(detail.message || 'Validation error');
+        });
+      } else {
+        const errorMsg = errorObj?.message || 'Login failed. Please check credentials.';
+        toast.error(errorMsg);
+      }
       return false;
     } finally {
       setIsLoading(false);
@@ -145,12 +152,13 @@ export function AuthProvider({ children }) {
       navigate('/login');
       return true;
     } catch (error) {
-      const errorMsg = error.response?.data?.error?.message || 'Registration failed.';
-      if (error.response?.data?.error?.details) {
-        error.response.data.error.details.forEach((detail) => {
-          toast.error(detail.message);
+      const errorObj = error.response?.data?.error;
+      if (errorObj?.details && Array.isArray(errorObj.details) && errorObj.details.length > 0) {
+        errorObj.details.forEach((detail) => {
+          toast.error(detail.message || 'Validation error');
         });
       } else {
+        const errorMsg = errorObj?.message || 'Registration failed.';
         toast.error(errorMsg);
       }
       return false;
