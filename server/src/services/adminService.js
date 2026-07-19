@@ -33,6 +33,8 @@ const listUsers = async ({ page = 1, limit = 10 }) => {
         id: true,
         name: true,
         email: true,
+        avatarUrl: true,
+        githubId: true,
         role: true,
         createdAt: true,
         _count: {

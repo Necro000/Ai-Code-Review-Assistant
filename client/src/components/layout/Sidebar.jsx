@@ -136,9 +136,25 @@ export default function Sidebar() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 transition-colors border"
             style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name || 'User'}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                  if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                }}
+                className="w-8 h-8 rounded-full object-cover border border-[var(--color-border)] shadow-sm flex-shrink-0"
+              />
+            ) : null}
             <div
-              className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-black text-white flex-shrink-0"
-              style={{ background: 'var(--gradient-brand)', boxShadow: 'var(--shadow-glow)' }}
+              className="items-center justify-center w-8 h-8 rounded-full text-xs font-black text-white flex-shrink-0"
+              style={{
+                display: user?.avatarUrl ? 'none' : 'flex',
+                background: 'var(--gradient-brand)',
+                boxShadow: 'var(--shadow-glow)',
+              }}
             >
               {initials}
             </div>

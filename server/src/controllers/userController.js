@@ -14,6 +14,9 @@ const getProfile = async (req, res, next) => {
         id: true,
         name: true,
         email: true,
+        avatarUrl: true,
+        githubId: true,
+        role: true,
         createdAt: true,
       },
     });
@@ -32,14 +35,15 @@ const getProfile = async (req, res, next) => {
 };
 
 /**
- * Update user profile (name, email)
+ * Update user profile (name, email, avatarUrl)
  */
 const updateProfile = async (req, res, next) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, avatarUrl } = req.body;
     const updateData = {};
 
     if (name) {updateData.name = name.trim();}
+    if (avatarUrl !== undefined) {updateData.avatarUrl = avatarUrl ? avatarUrl.trim() : null;}
 
     if (email) {
       const normalizedEmail = email.toLowerCase().trim();
@@ -63,7 +67,7 @@ const updateProfile = async (req, res, next) => {
     if (Object.keys(updateData).length === 0) {
       const user = await prisma.user.findUnique({
         where: { id: req.userId },
-        select: { id: true, name: true, email: true, createdAt: true },
+        select: { id: true, name: true, email: true, avatarUrl: true, githubId: true, role: true, createdAt: true },
       });
       return sendSuccess(res, { data: { user }, message: 'No changes applied' });
     }
@@ -75,6 +79,9 @@ const updateProfile = async (req, res, next) => {
         id: true,
         name: true,
         email: true,
+        avatarUrl: true,
+        githubId: true,
+        role: true,
         createdAt: true,
       },
     });

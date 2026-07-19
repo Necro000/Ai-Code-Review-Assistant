@@ -46,6 +46,18 @@ export function AuthProvider({ children }) {
         setAccessToken(urlToken);
         // Clean URL to remove token
         window.history.replaceState({}, document.title, window.location.pathname);
+        try {
+          const response = await getProfileAPI();
+          setUser(response.data.user);
+          setIsLoading(false);
+          toast.success('Logged in with GitHub!');
+          navigate('/dashboard', { replace: true });
+          return;
+        } catch (err) {
+          clearAuth();
+          setIsLoading(false);
+          return;
+        }
       }
 
       const localToken = localStorage.getItem('accessToken');

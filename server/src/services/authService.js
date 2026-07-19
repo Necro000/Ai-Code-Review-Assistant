@@ -67,6 +67,9 @@ const registerUser = async (name, email, password) => {
       id: true,
       name: true,
       email: true,
+      avatarUrl: true,
+      githubId: true,
+      role: true,
       createdAt: true,
     },
   });
@@ -106,6 +109,10 @@ const loginUser = async (email, password) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      avatarUrl: user.avatarUrl,
+      githubId: user.githubId,
+      role: user.role,
+      createdAt: user.createdAt,
     },
   };
 };

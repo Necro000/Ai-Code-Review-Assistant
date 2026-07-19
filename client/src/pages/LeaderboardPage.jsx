@@ -125,9 +125,24 @@ export default function LeaderboardPage() {
                     </div>
 
                     {/* Avatar */}
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name || 'Developer'}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.style.display = 'none';
+                          if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                        }}
+                        className="w-9 h-9 rounded-full object-cover border border-[var(--color-border)] shadow-sm flex-shrink-0"
+                      />
+                    ) : null}
                     <div
-                      className="flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold text-white flex-shrink-0"
-                      style={{ background: 'var(--gradient-brand)' }}
+                      className="items-center justify-center w-9 h-9 rounded-full text-sm font-bold text-white flex-shrink-0"
+                      style={{
+                        display: user.avatarUrl ? 'none' : 'flex',
+                        background: 'var(--gradient-brand)',
+                      }}
                     >
                       {initials}
                     </div>

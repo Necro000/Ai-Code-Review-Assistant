@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   HiOutlineEnvelope,
   HiOutlineLockClosed,
@@ -27,8 +28,28 @@ const GithubIcon = () => (
 );
 
 export default function LoginPage() {
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [githubRedirecting, setGithubRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const errParam = params.get('error');
+    if (errParam) {
+      if (errParam === 'oauth') {
+        toast.error('GitHub authentication failed or was cancelled.');
+      } else {
+        toast.error(`Authentication error: ${errParam}`);
+      }
+      setGithubRedirecting(false);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [isAuthenticated, navigate]);
 
   const {
     register,

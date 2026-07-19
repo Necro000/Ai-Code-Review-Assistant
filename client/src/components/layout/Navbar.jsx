@@ -212,9 +212,22 @@ export default function Navbar() {
           title="Account Settings"
           aria-label="User Profile"
         >
+          {user?.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user.name || 'User'}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+              }}
+              className="w-8 h-8 rounded-full object-cover border border-[var(--color-border)] shadow-sm flex-shrink-0"
+            />
+          ) : null}
           <div
-            className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-black"
+            className="items-center justify-center w-8 h-8 rounded-full text-xs font-black flex-shrink-0"
             style={{
+              display: user?.avatarUrl ? 'none' : 'flex',
               background: 'var(--gradient-brand)',
               color: 'white',
               boxShadow: 'var(--shadow-glow)',

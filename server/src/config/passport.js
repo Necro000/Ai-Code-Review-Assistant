@@ -15,6 +15,7 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
       try {
         const email    = profile.emails?.[0]?.value;
         const githubId = profile.id.toString();
+        const avatarUrl = profile.photos?.[0]?.value || profile._json?.avatar_url || null;
 
         let user = await prisma.user.findFirst({
           where: { OR: [{ githubId }, { email }] },
@@ -27,15 +28,21 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
               email:     email || `${githubId}@github.noemail`,
               password:  '', // OAuth users don't have password
               githubId,
-              avatarUrl: profile.photos?.[0]?.value || null,
+              avatarUrl,
             },
           });
-        } else if (!user.githubId) {
-          // Link github profile if email already exists
-          user = await prisma.user.update({
-            where: { id: user.id },
-            data:  { githubId, avatarUrl: profile.photos?.[0]?.value },
-          });
+        } else {
+          // Link github profile if missing and sync avatarUrl
+          const updateData = {};
+          if (!user.githubId) updateData.githubId = githubId;
+          if (avatarUrl && user.avatarUrl !== avatarUrl) updateData.avatarUrl = avatarUrl;
+
+          if (Object.keys(updateData).length > 0) {
+            user = await prisma.user.update({
+              where: { id: user.id },
+              data:  updateData,
+            });
+          }
         }
 
         done(null, user);
