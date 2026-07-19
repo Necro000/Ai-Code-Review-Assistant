@@ -89,13 +89,13 @@ const loginUser = async (email, password) => {
   });
 
   if (!user) {
-    throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+    throw new AppError('No account found with this email. Please create a new account first.', 404, 'ACCOUNT_NOT_FOUND');
   }
 
   // Check password
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+    throw new AppError('Incorrect password. Please check your password and try again.', 401, 'INVALID_PASSWORD');
   }
 
   // Generate tokens
