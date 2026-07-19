@@ -34,8 +34,12 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
         } else {
           // Link github profile if missing and sync avatarUrl
           const updateData = {};
-          if (!user.githubId) updateData.githubId = githubId;
-          if (avatarUrl && user.avatarUrl !== avatarUrl) updateData.avatarUrl = avatarUrl;
+          if (!user.githubId) {
+            updateData.githubId = githubId;
+          }
+          if (avatarUrl && user.avatarUrl !== avatarUrl) {
+            updateData.avatarUrl = avatarUrl;
+          }
 
           if (Object.keys(updateData).length > 0) {
             user = await prisma.user.update({
