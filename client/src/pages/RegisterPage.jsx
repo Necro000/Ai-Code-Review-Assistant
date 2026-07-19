@@ -54,8 +54,12 @@ export default function RegisterPage() {
   };
 
   const onInvalid = (formErrors) => {
-    const firstError = Object.values(formErrors)[0]?.message;
-    toast.error(firstError || 'Please fill in all required fields.');
+    const errorMessages = Object.values(formErrors).map((e) => e.message).filter(Boolean);
+    if (errorMessages.length > 0) {
+      errorMessages.forEach((msg) => toast.error(msg));
+    } else {
+      toast.error('Please fill in all required fields correctly.');
+    }
   };
 
   const inputStyle = (hasError) => ({
