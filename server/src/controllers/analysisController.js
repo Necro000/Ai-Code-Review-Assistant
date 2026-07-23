@@ -1,6 +1,5 @@
 const codeService = require('../services/codeService');
 const projectService = require('../services/projectService');
-const { prisma } = require('../config/db');
 const { runCodeAnalysis } = require('../services/analysisOrchestrator');
 const { sendSuccess } = require('../utils/responseFormatter');
 const AppError = require('../utils/AppError');
@@ -18,7 +17,7 @@ const submitSnippet = async (req, res, next) => {
     }
 
     // Verify project belongs to user or accessible workspace
-    const project = await projectService.getProjectById(req.userId, projectId);
+    await projectService.getProjectById(req.userId, projectId);
 
     const processed = await codeService.processSnippet(code, language, projectId);
     
@@ -57,7 +56,7 @@ const uploadFiles = async (req, res, next) => {
     }
 
     // Verify project belongs to user or accessible workspace
-    const project = await projectService.getProjectById(req.userId, projectId);
+    await projectService.getProjectById(req.userId, projectId);
 
     const processedFiles = await codeService.processUploads(req.files, projectId);
     const results = [];

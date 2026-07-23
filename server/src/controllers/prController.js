@@ -3,7 +3,6 @@ const { runCodeAnalysis } = require('../services/analysisOrchestrator');
 const { sendSuccess } = require('../utils/responseFormatter');
 const AppError = require('../utils/AppError');
 const projectService = require('../services/projectService');
-const { prisma } = require('../config/db');
 
 /**
  * Extracts owner, repo, and pullNumber from a full GitHub PR URL if provided.
@@ -39,7 +38,7 @@ const reviewPR = async (req, res, next) => {
     }
 
     // Validate project access (personal or workspace)
-    const project = await projectService.getProjectById(req.userId, projectId);
+    await projectService.getProjectById(req.userId, projectId);
 
     const files = await fetchPRFiles(owner, repo, pullNumber);
     if (files.length === 0) {
