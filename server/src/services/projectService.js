@@ -21,12 +21,26 @@ const createProject = async (userId, projectName, githubUrl, workspaceId = null)
   });
 };
 
+const getAccessibleProjectWhereClause = (userId) => ({
+  OR: [
+    { userId },
+    {
+      workspace: {
+        OR: [
+          { ownerId: userId },
+          { members: { some: { userId } } }
+        ]
+      }
+    }
+  ]
+});
+
 /**
  * List all projects for a user
  */
 const listProjects = async (userId) => {
   return await prisma.project.findMany({
-    where: { userId },
+    where: getAccessibleProjectWhereClause(userId),
     orderBy: { createdAt: 'desc' },
   });
 };
@@ -38,7 +52,7 @@ const getProjectById = async (userId, projectId) => {
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      userId,
+      ...getAccessibleProjectWhereClause(userId),
     },
   });
 

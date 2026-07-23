@@ -2,6 +2,7 @@ const { fetchPRFiles } = require('../services/githubPRService');
 const { runCodeAnalysis } = require('../services/analysisOrchestrator');
 const { sendSuccess } = require('../utils/responseFormatter');
 const AppError = require('../utils/AppError');
+const projectService = require('../services/projectService');
 const { prisma } = require('../config/db');
 
 /**
@@ -37,13 +38,8 @@ const reviewPR = async (req, res, next) => {
       throw new AppError('Valid GitHub PR URL (or Owner, Repo, and PR Number) and Target Project are required.', 400, 'VALIDATION_ERROR');
     }
 
-    // Validate project ownership
-    const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: req.userId },
-    });
-    if (!project) {
-      throw new AppError('Project not found or access denied', 404, 'PROJECT_NOT_FOUND');
-    }
+    // Validate project access (personal or workspace)
+    const project = await projectService.getProjectById(req.userId, projectId);
 
     const files = await fetchPRFiles(owner, repo, pullNumber);
     if (files.length === 0) {

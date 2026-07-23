@@ -1,20 +1,33 @@
 const { prisma } = require('../config/db');
 const AppError = require('../utils/AppError');
 
+const getAccessibleWhereClause = (userId) => ({
+  OR: [
+    { project: { userId } },
+    {
+      project: {
+        workspace: {
+          OR: [
+            { ownerId: userId },
+            { members: { some: { userId } } }
+          ]
+        }
+      }
+    }
+  ]
+});
+
 /**
  * List all reviews for a user with pagination and basic sorting.
  */
 const listReviews = async (userId, { page = 1, limit = 10, sort = 'createdAt', order = 'desc' }) => {
   const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
   const take = parseInt(limit, 10);
+  const accessFilter = getAccessibleWhereClause(userId);
 
   const [reviews, total] = await Promise.all([
     prisma.review.findMany({
-      where: {
-        project: {
-          userId,
-        },
-      },
+      where: accessFilter,
       include: {
         project: {
           select: {
@@ -35,11 +48,7 @@ const listReviews = async (userId, { page = 1, limit = 10, sort = 'createdAt', o
       take,
     }),
     prisma.review.count({
-      where: {
-        project: {
-          userId,
-        },
-      },
+      where: accessFilter,
     }),
   ]);
 
@@ -61,9 +70,7 @@ const getReviewById = async (userId, reviewId) => {
   const review = await prisma.review.findFirst({
     where: {
       id: reviewId,
-      project: {
-        userId,
-      },
+      ...getAccessibleWhereClause(userId),
     },
     include: {
       project: {
@@ -110,11 +117,9 @@ const searchReviews = async (userId, { q = '', severity = '', reviewType = '', p
   const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
   const take = parseInt(limit, 10);
 
-  // Set up filters
+  const accessWhere = getAccessibleWhereClause(userId);
   const searchFilter = {
-    project: {
-      userId,
-    },
+    ...accessWhere,
   };
 
   if (reviewType) {
@@ -132,10 +137,14 @@ const searchReviews = async (userId, { q = '', severity = '', reviewType = '', p
 
   // Text search query matching summary or language
   if (q) {
-    searchFilter.OR = [
-      { summary: { contains: q, mode: 'insensitive' } },
-      { language: { contains: q, mode: 'insensitive' } },
-      { project: { projectName: { contains: q, mode: 'insensitive' } } },
+    searchFilter.AND = [
+      {
+        OR: [
+          { summary: { contains: q, mode: 'insensitive' } },
+          { language: { contains: q, mode: 'insensitive' } },
+          { project: { projectName: { contains: q, mode: 'insensitive' } } },
+        ],
+      },
     ];
   }
 
@@ -181,13 +190,11 @@ const searchReviews = async (userId, { q = '', severity = '', reviewType = '', p
  * Aggregate stats metrics for Dashboard view.
  */
 const getDashboardStats = async (userId) => {
+  const accessWhere = getAccessibleWhereClause(userId);
+
   // 1. Fetch total review counts and average score
   const reviewsSummary = await prisma.review.aggregate({
-    where: {
-      project: {
-        userId,
-      },
-    },
+    where: accessWhere,
     _count: {
       id: true,
     },
@@ -205,11 +212,7 @@ const getDashboardStats = async (userId) => {
   const findingsCount = await prisma.reviewFinding.groupBy({
     by: ['severity'],
     where: {
-      review: {
-        project: {
-          userId,
-        },
-      },
+      review: accessWhere,
     },
     _count: {
       id: true,
@@ -233,9 +236,7 @@ const getDashboardStats = async (userId) => {
   // Calculate clean passes: reviews with 0 error or warning findings
   const cleanPassesCount = await prisma.review.count({
     where: {
-      project: {
-        userId,
-      },
+      ...accessWhere,
       findings: {
         none: {
           severity: {
@@ -248,11 +249,7 @@ const getDashboardStats = async (userId) => {
 
   // 3. Fetch recent reviews for score trend chart (recent 10)
   const recentReviews = await prisma.review.findMany({
-    where: {
-      project: {
-        userId,
-      },
-    },
+    where: accessWhere,
     select: {
       id: true,
       overallScore: true,
@@ -271,11 +268,7 @@ const getDashboardStats = async (userId) => {
   // 4. Fetch reviews grouped by language
   const languageGroups = await prisma.review.groupBy({
     by: ['language'],
-    where: {
-      project: {
-        userId,
-      },
-    },
+    where: accessWhere,
     _count: {
       id: true,
     },

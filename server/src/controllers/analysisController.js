@@ -1,4 +1,5 @@
 const codeService = require('../services/codeService');
+const projectService = require('../services/projectService');
 const { prisma } = require('../config/db');
 const { runCodeAnalysis } = require('../services/analysisOrchestrator');
 const { sendSuccess } = require('../utils/responseFormatter');
@@ -16,14 +17,8 @@ const submitSnippet = async (req, res, next) => {
       throw new AppError('Project ID is required', 400, 'PROJECT_ID_REQUIRED');
     }
 
-    // Verify project belongs to user
-    const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: req.userId },
-    });
-
-    if (!project) {
-      throw new AppError('Project not found', 404, 'PROJECT_NOT_FOUND');
-    }
+    // Verify project belongs to user or accessible workspace
+    const project = await projectService.getProjectById(req.userId, projectId);
 
     const processed = await codeService.processSnippet(code, language, projectId);
     
@@ -61,14 +56,8 @@ const uploadFiles = async (req, res, next) => {
       throw new AppError('Project ID is required', 400, 'PROJECT_ID_REQUIRED');
     }
 
-    // Verify project belongs to user
-    const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: req.userId },
-    });
-
-    if (!project) {
-      throw new AppError('Project not found', 404, 'PROJECT_NOT_FOUND');
-    }
+    // Verify project belongs to user or accessible workspace
+    const project = await projectService.getProjectById(req.userId, projectId);
 
     const processedFiles = await codeService.processUploads(req.files, projectId);
     const results = [];
