@@ -64,23 +64,31 @@ const listReviews = async (userId, { page = 1, limit = 10, sort = 'createdAt', o
 };
 
 /**
- * Get detailed review by ID (including findings) verifying ownership.
+ * Get detailed review by ID (including findings) verifying ownership or workspace membership.
  */
 const getReviewById = async (userId, reviewId) => {
-  const review = await prisma.review.findFirst({
-    where: {
-      id: reviewId,
-      ...getAccessibleWhereClause(userId),
-    },
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
     include: {
       project: {
         select: {
+          id: true,
           projectName: true,
+          userId: true,
+          workspaceId: true,
+          workspace: {
+            select: {
+              ownerId: true,
+              members: {
+                select: { userId: true },
+              },
+            },
+          },
         },
       },
       findings: {
         orderBy: [
-          { severity: 'asc' }, // error -> warning -> info based on string sort or custom map if desired
+          { severity: 'asc' },
           { lineNumber: 'asc' },
         ],
       },
@@ -89,6 +97,16 @@ const getReviewById = async (userId, reviewId) => {
 
   if (!review) {
     throw new AppError('Review not found', 404, 'REVIEW_NOT_FOUND');
+  }
+
+  // Permission check
+  const isProjectOwner = review.project?.userId === userId;
+  const workspace = review.project?.workspace;
+  const isWorkspaceOwner = workspace?.ownerId === userId;
+  const isWorkspaceMember = workspace?.members?.some((m) => m.userId === userId);
+
+  if (!isProjectOwner && !isWorkspaceOwner && !isWorkspaceMember) {
+    throw new AppError('Forbidden: You do not have permission to view this review', 403, 'FORBIDDEN');
   }
 
   return review;

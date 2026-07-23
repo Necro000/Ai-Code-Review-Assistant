@@ -46,18 +46,33 @@ const listProjects = async (userId) => {
 };
 
 /**
- * Get project details by ID
+ * Get project details by ID verifying ownership or workspace membership
  */
 const getProjectById = async (userId, projectId) => {
-  const project = await prisma.project.findFirst({
-    where: {
-      id: projectId,
-      ...getAccessibleProjectWhereClause(userId),
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: {
+      workspace: {
+        select: {
+          ownerId: true,
+          members: {
+            select: { userId: true },
+          },
+        },
+      },
     },
   });
 
   if (!project) {
     throw new AppError('Project not found', 404, 'PROJECT_NOT_FOUND');
+  }
+
+  const isOwner = project.userId === userId;
+  const isWsOwner = project.workspace?.ownerId === userId;
+  const isWsMember = project.workspace?.members?.some((m) => m.userId === userId);
+
+  if (!isOwner && !isWsOwner && !isWsMember) {
+    throw new AppError('Forbidden: You do not have access to this project', 403, 'FORBIDDEN');
   }
 
   return project;
