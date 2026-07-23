@@ -95,8 +95,10 @@ const getReviewById = async (userId, reviewId) => {
     },
   });
 
+  console.log('[DEBUG getReviewById] reviewId:', reviewId, 'userId:', userId, 'found:', !!review);
+
   if (!review) {
-    throw new AppError('Review not found', 404, 'REVIEW_NOT_FOUND');
+    throw new AppError(`Review not found for ID "${reviewId}"`, 404, 'REVIEW_NOT_FOUND');
   }
 
   // Permission check
